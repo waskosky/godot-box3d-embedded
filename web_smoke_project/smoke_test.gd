@@ -29,6 +29,7 @@ var _platform: MovingPlatform
 var _platform_rider: CharacterBody3D
 var _platform_grounded := 0
 var _platform_ok := true
+var _large_surfaces_ok := false
 var _physics_usec := 0
 var _physics_frames := 0
 var _status_label: Label
@@ -55,6 +56,8 @@ func _ready() -> void:
     _create_terrain_characters()
     _create_moving_platform()
     _create_query_targets()
+    # Run alongside the bounded movement fixture, not after its walkers reach an edge.
+    _check_large_surface_motion()
     _run_checks()
 
 
@@ -66,7 +69,7 @@ func _box_collision(size: Vector3) -> CollisionShape3D:
     return collision
 
 
-func _check_large_surface_motion() -> bool:
+func _check_large_surface_motion() -> void:
     var ok := true
     for width in [100.0, 10000.0, -1.0]:
         var floor_body := StaticBody3D.new()
@@ -117,7 +120,7 @@ func _check_large_surface_motion() -> bool:
             await get_tree().process_frame
         floor_body.queue_free()
         await get_tree().process_frame
-    return ok
+    _large_surfaces_ok = ok
 
 
 func _create_character_supports() -> void:
@@ -482,8 +485,7 @@ func _run_checks() -> void:
     var direct_queries_ok := _check_direct_queries()
     if not direct_queries_ok:
         failures.append("Direct queries returned incorrect contact geometry, margins or ray options")
-    var large_surfaces_ok := await _check_large_surface_motion()
-    if not large_surfaces_ok:
+    if not _large_surfaces_ok:
         failures.append("Motion queries missed a large box or world boundary")
     for fixture in _terrain:
         print("Terrain %d: progress=%.3f grounded=%d height_error=%.4f" % [fixture.kind, fixture.body.position.x - fixture.start, fixture.grounded, fixture.max_height_error])
@@ -539,7 +541,7 @@ func _run_checks() -> void:
     _append_status("Separation ray recovery without casting: %s" % ("PASS" if embedded_ok else "FAIL"))
     _append_status("Animated platform character support: %s" % ("PASS" if _platform_ok else "FAIL"))
     _append_status("Direct query geometry/options: %s" % ("PASS" if direct_queries_ok else "FAIL"))
-    _append_status("Large-surface character motion: %s" % ("PASS" if large_surfaces_ok else "FAIL"))
+    _append_status("Large-surface character motion: %s" % ("PASS" if _large_surfaces_ok else "FAIL"))
     _append_status("Six character queries: %.1f us/frame average" % (float(_physics_usec) / maxi(_physics_frames, 1)))
 
     if failures.is_empty():
