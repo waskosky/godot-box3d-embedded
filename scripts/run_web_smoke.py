@@ -39,6 +39,7 @@ def required_checks(lines: list[str]) -> dict[str, bool]:
         "ray_recovery": "Separation ray recovery without casting: PASS" in lines,
         "moving_platform": "Animated platform character support: PASS" in lines,
         "direct_queries": "Direct query geometry/options: PASS" in lines,
+        "large_surface_motion": "Large-surface character motion: PASS" in lines,
         "physics": "RESULT: PASS" in lines,
     }
 

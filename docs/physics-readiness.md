@@ -20,6 +20,8 @@ The native suite exercises actual Godot bodies and queries, including:
   normals, collision priority and per-call body/object exclusions.
 - Read-only motion queries, margin shells, separation-ray recovery/casting,
   grounded terrain traversal and rigid loads on idle/moving characters.
+- Swept cylinder/box contacts against large boxes and world boundaries, including
+  translated starts, slopes, walls, ceilings and clear or separating motion.
 - Animated kinematic platform carry, clean stops and small linear/angular
   targets; motion collisions report the platform's velocity.
 - Direct-query penetration pairs, mesh/heightmap targets, margins, rest normals
@@ -40,7 +42,7 @@ GODOT_BIN=/path/to/godot JOBS=4 scripts/run_headless_tests.sh
 ```
 
 The [Web smoke scene](../WEB_QUICKSTART.md#verify-the-included-smoke-project)
-checks live character slopes/terrain, loads and platform movement as well as
+checks live character slopes/terrain, large-surface motion, loads and platform movement as well as
 rigid settling, areas, hinges and separation rays. Run the same release export
 in Chromium, Firefox and WebKit. Its small character-query timing is diagnostic:
 it is not a device-performance or memory-growth qualification.

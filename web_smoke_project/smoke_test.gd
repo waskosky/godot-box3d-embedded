@@ -66,6 +66,60 @@ func _box_collision(size: Vector3) -> CollisionShape3D:
     return collision
 
 
+func _check_large_surface_motion() -> bool:
+    var ok := true
+    for width in [100.0, 10000.0, -1.0]:
+        var floor_body := StaticBody3D.new()
+        floor_body.collision_layer = 64
+        floor_body.collision_mask = 0
+        if width < 0.0:
+            var boundary := CollisionShape3D.new()
+            boundary.shape = WorldBoundaryShape3D.new()
+            floor_body.add_child(boundary)
+        else:
+            floor_body.position.y = -5.0
+            floor_body.add_child(_box_collision(Vector3(width, 10, width)))
+        add_child(floor_body)
+        for kind in ["cylinder", "box"]:
+            var body := CharacterBody3D.new()
+            body.collision_layer = 0
+            body.collision_mask = 64
+            body.position.y = 20.0
+            if kind == "cylinder":
+                var collision := CollisionShape3D.new()
+                var cylinder := CylinderShape3D.new()
+                cylinder.radius = 0.35
+                cylinder.height = 1.8
+                collision.shape = cylinder
+                body.add_child(collision)
+            else:
+                body.add_child(_box_collision(Vector3(0.7, 1.8, 0.7)))
+            add_child(body)
+            await get_tree().physics_frame
+            await get_tree().physics_frame
+            for position in [Vector2.ZERO, Vector2(0.1, 0), Vector2(-1.13, 0.1)]:
+                for gap in [0.001, 0.1, 1.0]:
+                    var parameters := PhysicsTestMotionParameters3D.new()
+                    parameters.from.origin = Vector3(position.x, 0.9 + gap, position.y)
+                    parameters.motion = Vector3.DOWN * maxf(0.02, 2.0 * gap)
+                    parameters.margin = 0.001
+                    parameters.recovery_as_collision = true
+                    var result := PhysicsTestMotionResult3D.new()
+                    var hit := PhysicsServer3D.body_test_motion(body.get_rid(), parameters, result)
+                    var valid := hit and result.get_collision_count() > 0
+                    if valid:
+                        var remaining_gap: float = gap + result.get_travel().y
+                        valid = result.get_collider_rid() == floor_body.get_rid() and result.get_collision_normal().dot(Vector3.UP) > 0.99 and remaining_gap >= -0.0005 and remaining_gap <= 0.007
+                    if not valid:
+                        print("Large surface miss: ", kind, " width=", width, " gap=", gap, " position=", position)
+                        ok = false
+            body.queue_free()
+            await get_tree().process_frame
+        floor_body.queue_free()
+        await get_tree().process_frame
+    return ok
+
+
 func _create_character_supports() -> void:
     for index in 2:
         var character := CharacterBody3D.new()
@@ -428,6 +482,9 @@ func _run_checks() -> void:
     var direct_queries_ok := _check_direct_queries()
     if not direct_queries_ok:
         failures.append("Direct queries returned incorrect contact geometry, margins or ray options")
+    var large_surfaces_ok := await _check_large_surface_motion()
+    if not large_surfaces_ok:
+        failures.append("Motion queries missed a large box or world boundary")
     for fixture in _terrain:
         print("Terrain %d: progress=%.3f grounded=%d height_error=%.4f" % [fixture.kind, fixture.body.position.x - fixture.start, fixture.grounded, fixture.max_height_error])
         if fixture.body.position.x - fixture.start < 0.5 or fixture.grounded < 170:
@@ -482,6 +539,7 @@ func _run_checks() -> void:
     _append_status("Separation ray recovery without casting: %s" % ("PASS" if embedded_ok else "FAIL"))
     _append_status("Animated platform character support: %s" % ("PASS" if _platform_ok else "FAIL"))
     _append_status("Direct query geometry/options: %s" % ("PASS" if direct_queries_ok else "FAIL"))
+    _append_status("Large-surface character motion: %s" % ("PASS" if large_surfaces_ok else "FAIL"))
     _append_status("Six character queries: %.1f us/frame average" % (float(_physics_usec) / maxi(_physics_frames, 1)))
 
     if failures.is_empty():
