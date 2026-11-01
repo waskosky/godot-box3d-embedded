@@ -14,6 +14,8 @@ Use **Godot 4.7** with [Web preview 1](https://github.com/waskosky/godot-box3d-e
 
 For worker-main execution, download the [static Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.1/godot-box3d-embedded-static-web.zip) and follow [static embedding](docs/static-embedding.md#use-the-prebuilt-preview) to select its Debug/Release templates. For an ordinary extension export, use the [ordinary Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.1/godot-box3d-web-release.zip) and [Web quick start](WEB_QUICKSTART.md). Keep the files from the same release together and verify the accompanying checksums.
 
+The tagged preview above predates newer motion-query fixes. For those fixes, use the qualified development snapshot and matching artifacts recorded in [Web preview qualification](docs/web-preview.md).
+
 The release includes [qualification evidence](docs/web-preview.md): bounded physics and cleanup pass in Chromium and Firefox on Linux software GL. Local Firefox timeouts, software-rendered text artifacts, hardware performance, WebKit and physical mobile acceptance remain explicit limits.
 
 ## Choose a Web build

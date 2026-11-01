@@ -17,6 +17,13 @@ does not guarantee escape from impossible overlaps.
 
 Motion casts report a hit when shapes would touch, rather than merely approach within Box3D's linear slop. Near-surface movement still detects the floor, and coplanar seams do not snag a sliding character.
 
+Contact refinement measures separation along GJK's normal rather than the
+Euclidean distance between its closest-point witnesses. This avoids overshooting
+large surfaces when the witnesses contain tangential numerical error. The
+large-surface regression covers cylinders and boxes against large box and
+world-boundary targets, rotated onto floors, slopes, walls and ceilings, with
+tangent, separating and short-of-contact sweeps as well as approaching motion.
+
 Motion queries are read-only: they do not move the character or collider, apply
 forces, or wake a rigid body. Per-call body/object exclusions apply to both
 recovery and casting. `recovery_as_collision=false` suppresses recovery-only

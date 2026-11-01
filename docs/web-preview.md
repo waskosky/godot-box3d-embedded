@@ -4,10 +4,76 @@ title: Web preview qualification
 
 # Web preview qualification
 
-Consistency candidate: `9a4c0daa603753888e469ec6cf2717b0b4693a9a`.
-The [static workflow](https://github.com/waskosky/godot-box3d-embedded/actions/runs/40746990330), [native build and physics suite](https://github.com/waskosky/godot-box3d-embedded/actions/runs/40746980906), and [ordinary Web pipeline](https://github.com/waskosky/godot-box3d-embedded/actions/runs/40746981088) retain separate qualification evidence. Ordinary Web CI does not qualify static embedding.
+Current qualified physics snapshot: `47cc6a0e50a70411fbae4373cd39444ecaf61435`.
+Use its [static bundle and browser results](https://github.com/waskosky/godot-box3d-embedded/actions/runs/41267508528)
+or [ordinary Web package](https://github.com/waskosky/godot-box3d-embedded/actions/runs/41267506200)
+for the large-surface motion fix. The tagged `v0.2.7-embedded.1` preview predates
+this fix. Documentation-only follow-ups do not change the tested physics source
+or replace its artifact identity. Ordinary Web CI does not qualify static embedding.
+
+## Large-surface motion refinement (2026-10-31)
+
+The adapter now advances using witness separation along GJK's normal. This
+prevents tangential closest-point error from inflating the gap, overshooting a
+surface and discarding an otherwise valid native cast. It addresses
+[upstream issue #41](https://github.com/bearlikelion/godot-box3d/issues/41);
+the independent upstream candidate is [PR #42](https://github.com/bearlikelion/godot-box3d/pull/42).
+Dependency pins and contact tolerances are unchanged.
+
+Both upstream and downstream changed from 444 misses to zero in the same
+3,920-query diagnostic sweep on Godot 4.7/macOS. The new focused regression
+passes 768 cylinder/box checks against large boxes and world boundaries,
+including floors, slopes, walls, ceilings and clear or separating motion.
+All 42 downstream native tests passed locally. The upstream candidate passes
+all 36 tests locally and in Linux/Windows CI, with a passing macOS CI build.
+
+The ordinary Web pipeline passes all eleven Chromium smoke checks, including
+54 large-surface queries, in 5.837 seconds. The updated fixture runs these
+queries alongside the existing 180-frame movement scene, preserving its duration.
+Local headless Chromium also passes all eleven checks using the official
+Godot 4.7 dynamic-link template; its 38.913-second observation is not a startup
+performance qualification.
+
+The static workflow restored the engine compilation cache, rebuilt matching
+archives and hosts, and passed every smoke check under Xvfb/software GL:
+
+| Target | Browser | Physics smoke | Seconds to physics PASS |
+|---|---|---|---:|
+| Release | Chromium | All eleven checks pass | 6.095 |
+| Release | Firefox | All eleven checks pass | 7.078 |
+| Debug | Chromium | All eleven checks pass | 6.961 |
+| Debug | Firefox | All eleven checks pass | 6.303 |
+
+Both Release workloads complete all six construction/movement/cleanup cycles
+with the active `Box3DPhysicsServer3D`, no captured errors and stable cleanup
+counts of seven nodes and three resources. First active workload is observed
+at 2.836 seconds in Chromium and 3.973 seconds in Firefox. Both reports mark
+`hardware_timing_eligible=false`; these CI observations do not establish device
+performance budgets.
+
+The ordinary capture, four static smoke frames and both workload loaded/final
+pairs were inspected. Release Firefox and Debug Chromium smoke captures still
+show missing glyphs; the other smoke captures and both completed workload
+captures have readable text. This repeats the earlier software-GL limitation
+and is not visual acceptance on target hardware.
+
+The retained manifest identifies clean source `47cc6a0`, the original
+`erincatto/box3d` repository and the unchanged dependency tuple. The bundle
+checksum and all six enclosed archive/template hashes were verified. The
+static template SHA-256 values are:
+
+- Release: `82e703175cfb0ab33cf138faa91099b63db5d7d9ce3ec88f6ba059d899fcbccf`
+- Debug: `dad1635f86792f800ca5cec6b921bf1c03106643bd12900c6af9c7c4363c6e34`
+
+The exported `smoke_test.gd` hash is
+`fd75f6ad08c600bacffdab321a33cae7c04abc7bd718f7f2e092b8f1339b03dd`.
+The workload fixture retains its earlier hash. Keep these receipts with the
+browser results when selecting a deployment pin.
 
 ## Consistency refresh (2026-10-28)
+
+Consistency candidate: `9a4c0daa603753888e469ec6cf2717b0b4693a9a`.
+The [static workflow](https://github.com/waskosky/godot-box3d-embedded/actions/runs/40746990330), [native build and physics suite](https://github.com/waskosky/godot-box3d-embedded/actions/runs/40746980906), and [ordinary Web pipeline](https://github.com/waskosky/godot-box3d-embedded/actions/runs/40746981088) retain this earlier snapshot's separate qualification evidence.
 
 The refresh aligns ray and Viewport-picking regressions with the focused
 upstream candidates while preserving the fork's Box3D pin and heightmap mesh
