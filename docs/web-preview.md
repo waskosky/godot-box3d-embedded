@@ -39,9 +39,22 @@ seconds. The final settled capture has readable text and visible scene geometry.
 These headless/software-rendered observations do not establish hardware budgets
 or resolve the separate Linux CI glyph artifacts.
 
+Headless Firefox 151 also completes all six workload cycles with stable cleanup
+counts and no captured errors, using the same template with one requested
+physics worker. First active workload is observed at 40.079 seconds in a fresh
+context and 38.810 seconds after the unchanged smoke warms that context. The
+workloads finish in 169.747 and 171.997 seconds under the existing 180-second
+limit; the warm-up smoke itself passes all eleven checks in 31.607 seconds.
+Loaded/final captures are readable and show completed cleanup. Both startup
+observations exceed the provisional 10-second fresh / 5-second warm goals,
+and both reports retain `hardware_timing_eligible=false`. Host load and headless
+rendering prevent attributing these observations to an isolated solver cost.
+Earlier incomplete runs remain in the record and are not reclassified.
+
 The November 6 local hardware probe still cannot launch headed Chromium,
 Firefox or WebKit on a blank page. No physical Android or Apple devices are
-connected. These environment limits leave hardware timing, visual acceptance
+connected. Headless WebKit also times out during launch before loading Godot.
+These environment limits leave hardware timing, visual acceptance
 and physical-device qualification open; the earlier software-GL results remain
 the release's established browser coverage.
 
