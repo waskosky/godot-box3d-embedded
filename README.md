@@ -8,6 +8,8 @@ We maintain static embedding into custom Godot Web templates, application execut
 
 **Status: experimental.** Passing regressions establish a development baseline. Device support, startup latency, sustained frame pacing, and memory budgets require qualification for the application using the backend. See [physics readiness](docs/physics-readiness.md) and [release qualification](docs/release-qualification.md).
 
+This branch evaluates the original Box3D repository's October 28 Dynamic Mover update. All 43 native regressions pass on macOS x86-64; Web qualification is pending. See the [compatibility experiment](docs/box3d-dynamic-mover-evaluation.md). Qualified deployment artifacts remain available from downstream `main` and Web preview 2.
+
 ## Try the prebuilt Web preview
 
 Use **Godot 4.7** with [Web preview 2](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.2). Install its [native editor addon](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.2/godot-box3d-embedded-native-editor.zip) by copying `addons/godot-box3d/` into your project, then select **Box3D Physics** and the Compatibility renderer.
