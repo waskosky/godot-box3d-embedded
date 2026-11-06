@@ -10,7 +10,7 @@ The purpose is to run the application main loop in a worker while the browser ow
 
 ## Use the prebuilt preview
 
-[Web preview 1](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.1) contains matching artifacts for Godot 4.7:
+[Web preview 2](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.2) contains matching artifacts for Godot 4.7, including the large-surface motion fix:
 
 1. Install `godot-box3d-embedded-native-editor.zip` by copying its `addons/godot-box3d/` into your project. Select **Box3D Physics** and the Compatibility renderer.
 2. Extract `godot-box3d-embedded-static-web.zip`. Set the Web preset's custom Debug and Release template paths to the ZIPs in its `templates/` directory.

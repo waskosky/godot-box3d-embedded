@@ -4,7 +4,7 @@ Godot Web exports can load `godot-box3d` when the extension side module and the 
 
 ## Fastest route: use a prebuilt Web bundle
 
-Install the normal desktop addon first. For a tagged fork version, download its versioned Web ZIP and `.sha256` checksum from [fork Releases](https://github.com/waskosky/godot-box3d-embedded/releases) when available. For development snapshots, download the `godot-box3d-web-release` artifact from a successful [Web build and smoke run](https://github.com/waskosky/godot-box3d-embedded/actions/workflows/web.yml). Match the addon and Web files to the same qualified source revision.
+For the current preview, use **Godot 4.7** and install the [preview 2 native editor addon](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.2/godot-box3d-embedded-native-editor.zip). Download its matching [Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.2/godot-box3d-web-release.zip) and [SHA-256 checksum](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.2/godot-box3d-web-release.zip.sha256). Both use qualified source `47cc6a0`, including the large-surface motion fix. For development snapshots, download the `godot-box3d-web-release` artifact from a successful [Web build and smoke run](https://github.com/waskosky/godot-box3d-embedded/actions/workflows/web.yml). Match the addon and Web files to the same qualified source revision.
 
 The archive contains:
 

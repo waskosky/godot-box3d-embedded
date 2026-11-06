@@ -5,11 +5,45 @@ title: Web preview qualification
 # Web preview qualification
 
 Current qualified physics snapshot: `47cc6a0e50a70411fbae4373cd39444ecaf61435`.
-Use its [static bundle and browser results](https://github.com/waskosky/godot-box3d-embedded/actions/runs/41267508528)
-or [ordinary Web package](https://github.com/waskosky/godot-box3d-embedded/actions/runs/41267506200)
-for the large-surface motion fix. The tagged `v0.2.7-embedded.1` preview predates
-this fix. Documentation-only follow-ups do not change the tested physics source
-or replace its artifact identity. Ordinary Web CI does not qualify static embedding.
+Download the matching native editor addon, static bundle or ordinary Web package
+from [Web preview 2](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.2).
+The [static browser results](https://github.com/waskosky/godot-box3d-embedded/actions/runs/41267508528)
+and [ordinary Web pipeline](https://github.com/waskosky/godot-box3d-embedded/actions/runs/41267506200)
+retain the original qualification. Preview 1 predates the large-surface fix.
+Documentation and regression-only follow-ups do not change the tested physics
+source or replace its artifact identity. Ordinary Web CI does not qualify static embedding.
+
+## Web preview 2 (2026-11-06)
+
+The release freezes the already-qualified `47cc6a0` source. Native editor
+libraries for Linux x86-64, Windows x86-64 and universal macOS come from the
+[matching native pipeline](https://github.com/waskosky/godot-box3d-embedded/actions/runs/41268466894).
+Its ordinary Web and static Debug/Release bundles retain the original build
+manifests and binary/template hashes. Refreshed documentation is identified
+separately in `RELEASE_DOCUMENTATION.json`, and the release ZIP checksums cover
+that packaging. `QUALIFICATION.json` links the source, CI runs and artifact
+hashes; the qualification ZIP retains the browser reports and captures.
+
+The preview includes the large-surface motion fix below and the October 28
+shape-cast corrections: clear casts return `[1.0, 1.0]`, initial overlaps are
+ignored, and obstacles later in the sweep remain detectable. The independent
+upstream shape-cast submission is [PR #43](https://github.com/bearlikelion/godot-box3d/pull/43).
+The downstream focused regression replaces overlapping assertions in the older
+query test; this test organization does not change the released binaries.
+
+Using the exact CI-built static Release template, local headless Chromium
+passes all eleven checks on the initial load and 20 reloads, followed by a
+60-second observation without captured errors. The initial observation is
+7.233 seconds to physics PASS; subsequent loads range from 5.683 to 6.350
+seconds. The final settled capture has readable text and visible scene geometry.
+These headless/software-rendered observations do not establish hardware budgets
+or resolve the separate Linux CI glyph artifacts.
+
+The November 6 local hardware probe still cannot launch headed Chromium,
+Firefox or WebKit on a blank page. No physical Android or Apple devices are
+connected. These environment limits leave hardware timing, visual acceptance
+and physical-device qualification open; the earlier software-GL results remain
+the release's established browser coverage.
 
 ## Large-surface motion refinement (2026-10-31)
 
