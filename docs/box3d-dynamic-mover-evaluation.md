@@ -20,8 +20,24 @@ failure or Box3D RID-leak markers are reported.
 The local build uses the existing cached-bindings CMake check project and
 compiles this worktree's full adapter and Box3D sources. Logs are retained
 locally under `build/validation/`; this does not establish fresh-platform,
-sanitizer, Android or static-Web qualification. Ordinary Web compilation and
-browser smoke are the next bounded compatibility check.
+sanitizer, Android or static-Web qualification.
+
+Ordinary Release Web also compiles with Emscripten 4.0.20 and the existing
+Godot 4.3 bindings archive. The clean code candidate `8436ab3` exports with
+the matching Godot 4.7 dynamic-link template, SHA-256
+`ffe2600af69db329d8a68f5a4872b8d00ae2e4b0536d3a789bf4ee8182b2cac9`.
+Headless Chromium passes all eleven smoke checks without captured errors in
+7.194 seconds; the final frame has readable text and visible scene geometry.
+This single diagnostic timing is not a performance comparison or budget.
+
+The Web check compiles this worktree's full adapter and Box3D sources through
+the existing cached-bindings CMake helper. Its export manifest records clean
+source `8436ab3`, fixture hashes and side-module/template hashes. The Release
+side module's SHA-256 is
+`b9b8b3ab282e99167125571028bafa7d2d37e38846f94807bedcfb0b5ba2f8f0`.
+Local evidence is under `build/web-smoke-candidate`, `build/chromium-candidate.json`
+and `build/chromium-candidate.png`. This check covers the ordinary extension
+profile; it does not qualify newly embedded static templates or Firefox/WebKit.
 
 ## What the new engine API means
 

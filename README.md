@@ -8,7 +8,7 @@ We maintain static embedding into custom Godot Web templates, application execut
 
 **Status: experimental.** Passing regressions establish a development baseline. Device support, startup latency, sustained frame pacing, and memory budgets require qualification for the application using the backend. See [physics readiness](docs/physics-readiness.md) and [release qualification](docs/release-qualification.md).
 
-This branch evaluates the original Box3D repository's October 28 Dynamic Mover update. All 43 native regressions pass on macOS x86-64; Web qualification is pending. See the [compatibility experiment](docs/box3d-dynamic-mover-evaluation.md). Qualified deployment artifacts remain available from downstream `main` and Web preview 2.
+This branch evaluates the original Box3D repository's October 28 Dynamic Mover update. All 43 native regressions pass on macOS x86-64, and ordinary Release Web passes all eleven Chromium smoke checks. Static-host qualification is pending. See the [compatibility experiment](docs/box3d-dynamic-mover-evaluation.md). Qualified deployment artifacts remain available from downstream `main` and Web preview 2.
 
 ## Try the prebuilt Web preview
 
