@@ -37,6 +37,8 @@ The native suite exercises actual Godot bodies and queries, including:
 - Live material friction/restitution edits and rough/absorbent mixing; staged
   hinge/slider setup, motor reversal, live limit changes, sleeping-body wake-up,
   connected-node teardown and setters after native joint destruction.
+- Quantitative hinge motor impulse budgets across 30/60/120 Hz, time-scale
+  changes, rotated axes, live edits and equal/opposite dynamic endpoint response.
 
 Run the complete native suite with a matching Godot executable:
 

@@ -107,6 +107,29 @@ spring and anchor writes leave sleeping bodies alone. Setters do not call throug
 a connected body leaves its space.
 
 The current wrappers require two bodies; a single-body joint anchored to the
-world is not implemented. Hinge `MOTOR_MAX_IMPULSE` is still forwarded as Box3D's
-maximum torque, not a timestep-aware impulse conversion. Passing motor/limit
-movement checks does not establish matching motor strength across engines.
+world is not implemented.
+
+## Hinge motor impulse budget
+
+`HingeJoint3D.motor/max_impulse` is an angular impulse cap per full Godot physics
+tick, not a torque. The adapter converts it to Box3D's maximum torque using the
+actual space step: `torque = max_impulse / step_seconds`. Box3D's substeps share
+that tick budget; it is not multiplied by the substep count. Runtime tick-rate
+and time-scale changes are handled without rewriting the requested parameter.
+The getter continues to return the original impulse value.
+
+This intentionally strengthens motors compared with the old direct torque
+mapping: at 60 Hz and time scale 1, a value of 1 now means up to 1 angular
+impulse per tick (60 Nm), rather than 1 Nm. Retune old scenes accordingly. To
+request a constant torque, set the impulse cap to `desired_torque * step_seconds`;
+holding an impulse cap fixed while changing tick rate does not hold torque fixed.
+
+Zero impulse and a disabled motor add no motor impulse. Negative/non-finite caps
+are rejected; zero-duration steps do not divide by zero. Deleted native joints
+are discarded from the space's limit records before use. Unchanged torque limits
+are not rewritten each tick, and refreshing limits does not wake sleeping bodies.
+
+The focused regression measures angular velocity changes with known inertia on
+a rotated hinge, 30/60/120 Hz, multiple time scales, live edits, reversal and two
+dynamic endpoints. It verifies a per-tick budget, not exact trajectory parity with
+GodotPhysics3D's iterative solver.

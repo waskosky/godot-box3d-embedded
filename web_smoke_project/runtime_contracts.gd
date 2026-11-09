@@ -4,6 +4,7 @@ extends Node3D
 var complete: bool = false
 var materials_ok: bool = true
 var joints_ok: bool = true
+var hinge_impulse_ok: bool = false
 
 
 func _ready() -> void:
@@ -81,6 +82,26 @@ func _run() -> void:
 	hinge.set_param(HingeJoint3D.PARAM_MOTOR_MAX_IMPULSE, 100.0)
 	hinge.set_param(HingeJoint3D.PARAM_MOTOR_TARGET_VELOCITY, 2.0)
 	hinge.set_flag(HingeJoint3D.FLAG_ENABLE_MOTOR, true)
+	var weak_rotor: RigidBody3D = RigidBody3D.new()
+	weak_rotor.position = Vector3(0, 0, 14)
+	weak_rotor.gravity_scale = 0.0
+	weak_rotor.can_sleep = false
+	weak_rotor.collision_layer = 0
+	weak_rotor.collision_mask = 0
+	weak_rotor.inertia = Vector3.ONE
+	weak_rotor.angular_damp_mode = RigidBody3D.DAMP_MODE_REPLACE
+	weak_rotor.angular_damp = 0.0
+	weak_rotor.add_child(_box(Vector3.ONE))
+	add_child(weak_rotor)
+	var weak_hinge: HingeJoint3D = HingeJoint3D.new()
+	weak_hinge.position = weak_rotor.position
+	add_child(weak_hinge)
+	weak_hinge.node_a = weak_hinge.get_path_to(anchor)
+	weak_hinge.node_b = weak_hinge.get_path_to(weak_rotor)
+	weak_hinge.set_param(HingeJoint3D.PARAM_MOTOR_TARGET_VELOCITY, 10.0)
+	weak_hinge.set_param(HingeJoint3D.PARAM_MOTOR_MAX_IMPULSE, 0.001)
+	weak_hinge.set_flag(HingeJoint3D.FLAG_ENABLE_MOTOR, true)
+	var initial_spin: float = 0.0
 	var carriage: RigidBody3D = RigidBody3D.new()
 	carriage.position = Vector3(0, 0, 12)
 	carriage.gravity_scale = 0.0
@@ -101,10 +122,12 @@ func _run() -> void:
 		for index in balls.size():
 			bounced[index] = bounced[index] or balls[index].linear_velocity.y > 2.0
 		if frame == 10:
+			initial_spin = weak_rotor.angular_velocity.z
 			slider_body.linear_velocity = Vector3(4, 0, 0)
 			ball_materials[0].bounce = 0.8
 			carriage.linear_velocity.x = 3.0
 		elif frame == 40:
+			hinge_impulse_ok = absf(weak_rotor.angular_velocity.z - initial_spin - 0.03) < 0.002
 			materials_ok = materials_ok and slider_body.linear_velocity.x > 3.5
 			floor_material.friction = 1.0
 		elif frame == 85:

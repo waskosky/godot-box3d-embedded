@@ -550,6 +550,10 @@ func _run_checks() -> void:
     var joints_ok: bool = _runtime_contracts.complete and _runtime_contracts.joints_ok
     _append_status("Live PhysicsMaterial response: %s" % ("PASS" if materials_ok else "FAIL"))
     _append_status("Live hinge/slider constraints: %s" % ("PASS" if joints_ok else "FAIL"))
+    var hinge_impulse_ok: bool = _runtime_contracts.complete and _runtime_contracts.hinge_impulse_ok
+    _append_status("Hinge motor impulse budget: %s" % ("PASS" if hinge_impulse_ok else "FAIL"))
+    if not hinge_impulse_ok:
+        failures.append("Hinge motor impulse budget failed")
     if not materials_ok or not joints_ok:
         failures.append("Live material or joint contract failed")
     _append_status("Six character queries: %.1f us/frame average" % (float(_physics_usec) / maxi(_physics_frames, 1)))
