@@ -13,6 +13,48 @@ retain the original qualification. Preview 1 predates the large-surface fix.
 Documentation and regression-only follow-ups do not change the tested physics
 source or replace its artifact identity. Ordinary Web CI does not qualify static embedding.
 
+## Hinge motor units candidate (2026-11-09)
+
+Candidate `e644782e88512fecfe64166281bd143b24189909` adds the focused
+[hinge impulse fix (#46)](https://github.com/bearlikelion/godot-box3d/pull/46) to
+the integration feed. It uses the actual full physics step to convert an angular
+impulse cap into native torque. See [motor units and retuning](behavior-differences.md#hinge-motor-impulse-budget)
+before adopting it; the old direct torque mapping made the same numerical cap
+60 times weaker at 60 Hz / time scale 1.
+
+On the same macOS 15.7.1 x86-64 / Godot 4.7 host, all 46 downstream native tests
+pass. The standalone upstream branch, using upstream's unchanged Box3D pin,
+passes all 36 native tests. The new quantitative regression covers 30/60/120 Hz,
+runtime time-scale changes, a rotated axis, live/zero caps, motor disabling and
+reversal, and two dynamic endpoints. Eight strength cases fail on the previous
+binary. Existing high-strength hinge fixtures were retuned to preserve their
+original 100 Nm at 60 Hz; their assertions were not loosened.
+
+The new impulse regression and the joint setup/limit/wake-up regression also
+pass with the adapter and Box3D instrumented by AddressSanitizer. This is focused
+sanitizer coverage, not a new full-suite ASan or leak-detection receipt.
+
+A clean ordinary Web export of `23a156b` passes all 14 smoke checks in local
+headless Chromium (12.633 seconds) and Firefox (85.988 seconds), with no captured
+errors. Both frames were inspected and show readable PASS text and geometry.
+The later sampling-bound change affects only the native regression, not the
+tested adapter or Web fixture. The export manifest records all three fixture
+hashes and the unchanged dynamic template hash listed below. The side module is
+`625c59a3de160310d5a5e17bddb22d54e4b46e1d35d8d579b7431117aa2cc580`.
+These contended/headless timings are not startup or hardware acceptance.
+
+The previous `75ee90b` candidate's
+[static qualification completed successfully](https://github.com/waskosky/godot-box3d-embedded/actions/runs/42568959069),
+but that does not qualify the new motor mapping. The new
+[static workflow](https://github.com/waskosky/godot-box3d-embedded/actions/runs/42671462450)
+and [ordinary Web workflow](https://github.com/waskosky/godot-box3d-embedded/actions/runs/42671461394)
+reported GitHub internal server errors before their initial jobs could start;
+one retry of each has been requested. The
+[native pipeline](https://github.com/waskosky/godot-box3d-embedded/actions/runs/42671461380)
+and upstream CI are also separate acceptance receipts. At this checkpoint,
+downstream `main` and preview 2 remain unchanged; no new static-host qualification
+or release promotion is claimed.
+
 ## Advancing readiness candidate (2026-11-09)
 
 Candidate `75ee90bcbb4484c54d426c4852e079db07f420ed` is on `integration/next`,
