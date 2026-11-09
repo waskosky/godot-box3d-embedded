@@ -2,6 +2,7 @@ extends Node3D
 
 const EXPECTED_ENGINE := "Box3D Physics"
 const WebWorkload = preload("res://stress_test.gd")
+const RuntimeContracts = preload("res://runtime_contracts.gd")
 
 class MovingPlatform extends AnimatableBody3D:
     var frames := 0
@@ -30,6 +31,7 @@ var _platform_rider: CharacterBody3D
 var _platform_grounded := 0
 var _platform_ok := true
 var _large_surfaces_ok := false
+var _runtime_contracts: Node3D
 var _physics_usec := 0
 var _physics_frames := 0
 var _status_label: Label
@@ -56,6 +58,8 @@ func _ready() -> void:
     _create_terrain_characters()
     _create_moving_platform()
     _create_query_targets()
+    _runtime_contracts = RuntimeContracts.new()
+    add_child(_runtime_contracts)
     # Run alongside the bounded movement fixture, not after its walkers reach an edge.
     _check_large_surface_motion()
     _run_checks()
@@ -542,6 +546,12 @@ func _run_checks() -> void:
     _append_status("Animated platform character support: %s" % ("PASS" if _platform_ok else "FAIL"))
     _append_status("Direct query geometry/options: %s" % ("PASS" if direct_queries_ok else "FAIL"))
     _append_status("Large-surface character motion: %s" % ("PASS" if _large_surfaces_ok else "FAIL"))
+    var materials_ok: bool = _runtime_contracts.complete and _runtime_contracts.materials_ok
+    var joints_ok: bool = _runtime_contracts.complete and _runtime_contracts.joints_ok
+    _append_status("Live PhysicsMaterial response: %s" % ("PASS" if materials_ok else "FAIL"))
+    _append_status("Live hinge/slider constraints: %s" % ("PASS" if joints_ok else "FAIL"))
+    if not materials_ok or not joints_ok:
+        failures.append("Live material or joint contract failed")
     _append_status("Six character queries: %.1f us/frame average" % (float(_physics_usec) / maxi(_physics_frames, 1)))
 
     if failures.is_empty():

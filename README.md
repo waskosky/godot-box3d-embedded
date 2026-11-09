@@ -18,6 +18,12 @@ Preview 2 includes the large-surface motion and shape-cast query fixes. Its nati
 
 The release includes [qualification evidence](docs/web-preview.md): bounded physics and cleanup pass in Chromium and Firefox on Linux software GL. Local Firefox timeouts, software-rendered text artifacts, hardware performance, WebKit and physical mobile acceptance remain explicit limits.
 
+The advancing branch adds live material updates/Godot-style material mixing,
+staged hinge/slider setup fixes, scaling diagnostics and AddressSanitizer runtime
+checks. These do not change preview 2's frozen binaries. In particular, revisit
+material tuning when moving from the preview's older combine rules; see
+[behavior differences](docs/behavior-differences.md#physics-materials).
+
 ## Choose a Web build
 
 | Profile | How Box3D is loaded | When to use it |

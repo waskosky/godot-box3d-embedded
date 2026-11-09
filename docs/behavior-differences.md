@@ -61,11 +61,39 @@ query-only implementation.
 
 Viewport physics picking honors `CollisionObject3D.input_ray_pickable` for bodies and areas, including changes at runtime. Unpickable objects do not block picking an eligible object behind them. This flag does not filter ordinary scripted `intersect_ray()` queries or change physical collisions.
 
-## Friction and restitution combine differently
+## Physics materials
 
-Box3D uses `sqrt(a * b)` for friction and `max(a, b)` for restitution. Godot's built-in physics uses `min(a, b)` and a clamped sum.
+The adapter supplies Box3D mixing callbacks matching Godot's `PhysicsMaterial`
+contract. Ordinary friction takes the lower coefficient; a rough material takes
+precedence, and two rough materials take the higher coefficient. Restitution is
+the sum clamped to 0..1, with absorbent materials subtracting their bounce.
+The callbacks use only native coefficient/flag values and can run on physics workers.
 
-Materials tuned against Godot's defaults will not feel the same, so a port usually needs its friction values revisited.
+Changing a material resource or replacing an override updates existing fixtures,
+without rebuilding their geometry, mass or contact-monitor ownership. Future
+attachments and re-enabled shapes use the same current material.
+
+This changes older addon behavior, which used Box3D's geometric-mean friction and
+maximum restitution. Revisit material tuning made specifically for those rules.
+Matching these combine rules does not promise identical trajectories across solvers.
+
+## Collision transform scaling
+
+Use unit-scale body and collision attachment transforms, and change dimensions
+on `Shape3D` resources. Scaled, mirrored and sheared transforms emit a warning;
+they are not supported consistently across live fixtures and direct queries.
+Sphere radii ignore basis scale, capsules can scale endpoints without their
+radii, and live hulls discard scale when extracting rotations while query hull
+points use the full basis. Mesh attachment baking alone is not general scaling
+support. No normalization or partial scaling implementation is introduced here.
+
+## World boundaries are finite
+
+`WorldBoundaryShape3D` is represented by a finite plate extending 5,000 units
+from its center along each surface axis, with 10 units of thickness behind the
+plane. It is not an infinite solid half-space: its edges and underside are real
+collision surfaces. The large-surface motion fix improves contact refinement
+inside this representation; it does not change that geometric limitation.
 
 ## Ignored joint parameters
 

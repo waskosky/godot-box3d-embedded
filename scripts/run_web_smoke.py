@@ -40,6 +40,8 @@ def required_checks(lines: list[str]) -> dict[str, bool]:
         "moving_platform": "Animated platform character support: PASS" in lines,
         "direct_queries": "Direct query geometry/options: PASS" in lines,
         "large_surface_motion": "Large-surface character motion: PASS" in lines,
+        "live_materials": "Live PhysicsMaterial response: PASS" in lines,
+        "live_joints": "Live hinge/slider constraints: PASS" in lines,
         "physics": "RESULT: PASS" in lines,
     }
 

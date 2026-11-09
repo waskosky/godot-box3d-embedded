@@ -59,7 +59,7 @@ def main() -> int:
         "source": source_provenance(), "profile": args.profile, "target": args.target,
         "requested_box3d_workers": args.workers if args.workers is not None else 8,
         "template": {"name": template.name, "sha256": sha256(template)},
-        "fixture": {name: sha256(root / "web_smoke_project" / name) for name in ("smoke_test.gd", "stress_test.gd")},
+        "fixture": {name: sha256(root / "web_smoke_project" / name) for name in ("smoke_test.gd", "stress_test.gd", "runtime_contracts.gd")},
         "artifacts": {path.name: sha256(path) for path in output.iterdir() if path.suffix in (".wasm", ".pck")},
     }
     (output / "EXPORT_MANIFEST.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")

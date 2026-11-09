@@ -34,6 +34,8 @@ The native suite exercises actual Godot bodies and queries, including:
   hole-boundary falls and moving/rotating platform jump detachment.
 - CCD against a thin wall, rotated off-center impulse/inertia, sleep/wake,
   sustained finite states and repeated body creation/removal.
+- Live material friction/restitution edits and rough/absorbent mixing; staged
+  hinge/slider setup, motor reversal, live limit changes and connected-node teardown.
 
 Run the complete native suite with a matching Godot executable:
 
@@ -43,12 +45,22 @@ GODOT_BIN=/path/to/godot JOBS=4 scripts/run_headless_tests.sh
 
 The [Web smoke scene](../WEB_QUICKSTART.md#verify-the-included-smoke-project)
 checks live character slopes/terrain, large-surface motion, loads and platform movement as well as
-rigid settling, areas, hinges and separation rays. Run the same release export
+rigid settling, areas, hinges and separation rays. The advancing smoke also
+checks live material edits and hinge/slider limits within its existing movement
+window. Run the same release export
 in Chromium, Firefox and WebKit. Its small character-query timing is diagnostic:
 it is not a device-performance or memory-growth qualification.
 
 The opt-in [desktop Web workload](web-stress.md) adds repeated terrain/body
 construction, sustained movement and cleanup measurements to that same export.
+The [native terrain diagnostic](heightmap-geometry.md#bounded-construction-diagnostic)
+isolates construction and shared-resource update costs without imposing a
+machine-specific timing assertion on normal tests.
+
+Use `test_project/benchmarks/scaling_probe.gd` as an opt-in diagnostic of live
+fixture/query differences. Unsupported scaling is warned about, not normalized
+or implicitly declared supported. The [behavior notes](behavior-differences.md)
+also explain finite world boundaries and material migration.
 
 ## Remaining acceptance gates
 
