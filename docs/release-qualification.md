@@ -10,8 +10,19 @@ pins and retain the previous qualified version for rollback.
 
 Run `scripts/run_headless_tests.sh` with the supported Godot version and require
 backend activation, all physics regressions, and no unexpected errors or leaked
-Box3D RIDs. Native CI also covers the minimum Godot version and UBSan; its ASan
-job is a compile/link check, not an ASan runtime receipt.
+Box3D RIDs. Native CI also covers the minimum Godot version, UBSan runtime and
+macOS AddressSanitizer runtime. The separate Linux ASan/UBSan job remains a
+compile/link check. AddressSanitizer instruments the adapter and Box3D, not the
+official Godot executable or the external godot-cpp archive; it is not a
+whole-engine memory-safety certification or a native leak detector.
+
+For macOS AddressSanitizer runs, configure a separate build with
+`-DCMAKE_C_FLAGS="-fsanitize=address -fno-omit-frame-pointer -g"` and the same
+`CMAKE_CXX_FLAGS`, then set `BUILD_DIR`, `GODOT_BIN`,
+`GODOT_ASAN_RUNTIME="$(clang --print-file-name=libclang_rt.asan_osx_dynamic.dylib)"`
+and `ASAN_OPTIONS=halt_on_error=1:detect_leaks=0` when invoking the existing test
+runner. The runner preloads that compiler's runtime only into Godot, not build
+tools. Keep ordinary builds separate from instrumented ones.
 
 Build the Web side module and matching templates, export `web_smoke_project`,
 then run `scripts/run_web_smoke.py` in Chromium, Firefox and WebKit. Require all

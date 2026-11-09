@@ -4,6 +4,14 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 build_dir="${BUILD_DIR:-$repo_root/build}"
 godot_bin="${GODOT_BIN:-godot}"
+test_command=("$godot_bin")
+if [[ -n "${GODOT_ASAN_RUNTIME:-}" ]]; then
+	if [[ "$(uname -s)" != Darwin || ! -f "$GODOT_ASAN_RUNTIME" ]]; then
+		printf 'ERROR: GODOT_ASAN_RUNTIME must name the matching macOS AddressSanitizer runtime.\n' >&2
+		exit 1
+	fi
+	test_command=(env "DYLD_INSERT_LIBRARIES=$GODOT_ASAN_RUNTIME" "$godot_bin")
+fi
 test_addon_bin="$repo_root/test_project/addons/godot-box3d/bin"
 godot_metadata_dir="$repo_root/test_project/.godot"
 jobs="${JOBS:-$(nproc 2>/dev/null || sysctl -n hw.logicalcpu 2>/dev/null || printf '4')}"
@@ -89,7 +97,7 @@ run_test() {
 	local test_status=0
 
 	printf '\n== %s ==\n' "$test_script"
-	test_output="$("$godot_bin" --headless --path "$repo_root/test_project" --script "res://tests/$test_script" 2>&1)" || test_status=$?
+	test_output="$("${test_command[@]}" --headless --path "$repo_root/test_project" --script "res://tests/$test_script" 2>&1)" || test_status=$?
 	printf '%s\n' "$test_output"
 
 	if (( test_status == 0 )) && [[ "$test_output" == *"RIDs in Godot Box3D were found to not have been freed"* ]]; then

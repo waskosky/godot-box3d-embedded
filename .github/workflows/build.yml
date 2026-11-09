@@ -163,6 +163,48 @@ jobs:
       - name: Build with ASan and UBSan
         run: cmake --build build-sanitized --target godot-box3d --parallel
 
+  address-safety:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: true
+
+      - name: Install Godot
+        shell: bash
+        run: |
+          curl -L --fail --retry 3 \
+            -o "$RUNNER_TEMP/godot.zip" \
+            https://github.com/godotengine/godot-builds/releases/download/4.7-stable/Godot_v4.7-stable_macos.universal.zip
+          unzip -q "$RUNNER_TEMP/godot.zip" -d "$RUNNER_TEMP/godot"
+
+      - name: Configure AddressSanitizer build
+        run: >-
+          cmake -B build-asan -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_C_FLAGS="-fsanitize=address -fno-omit-frame-pointer -g"
+          -DCMAKE_CXX_FLAGS="-fsanitize=address -fno-omit-frame-pointer -g"
+
+      - name: Run physics regressions with AddressSanitizer
+        shell: bash
+        env:
+          GODOT_BIN: ${{ runner.temp }}/godot/Godot.app/Contents/MacOS/Godot
+          BUILD_DIR: ${{ github.workspace }}/build-asan
+          ASAN_OPTIONS: halt_on_error=1:detect_leaks=0
+          TEST_SUMMARY: ${{ runner.temp }}/asan-summary.md
+        run: |
+          GODOT_ASAN_RUNTIME="$(clang --print-file-name=libclang_rt.asan_osx_dynamic.dylib)"
+          export GODOT_ASAN_RUNTIME
+          scripts/run_headless_tests.sh
+
+      - name: Publish test summary
+        if: always()
+        shell: bash
+        run: |
+          if [[ -f "$RUNNER_TEMP/asan-summary.md" ]]; then
+            cat "$RUNNER_TEMP/asan-summary.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
   undefined-behavior:
     runs-on: ubuntu-latest
 
@@ -211,7 +253,7 @@ jobs:
         run: scripts/run_headless_tests.sh
 
   release:
-    needs: [build, compatibility, sanitizer-build, undefined-behavior]
+    needs: [build, compatibility, sanitizer-build, address-safety, undefined-behavior]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
