@@ -60,6 +60,8 @@ public:
 
 	void unregister_area(Box3DAreaImpl3D* p_area);
 
+	void set_hinge_motor_impulse(b3JointId p_joint, float p_impulse);
+
 	// Removes cached sensor overlap counts involving a fixture before it is destroyed.
 	// Box3D end events may carry an invalid ID for either side after destruction.
 	void remove_shape_overlaps(b3ShapeId p_shape_id);
@@ -86,6 +88,13 @@ public:
 	AreaOverrides compute_area_overrides(Box3DBodyImpl3D* p_body) const;
 
 private:
+	struct HingeMotorLimit {
+		float impulse = 0.0f;
+		float applied_torque = -1.0f;
+	};
+
+	void _update_hinge_motor_limits(float p_step);
+
 	struct PendingAreaEvent {
 		RID area_rid;
 		PhysicsServer3D::AreaBodyStatus status = PhysicsServer3D::AREA_BODY_ADDED;
@@ -139,6 +148,7 @@ private:
 
 	HashSet<Box3DBodyImpl3D*> bodies;
 	HashSet<Box3DAreaImpl3D*> areas;
+	HashMap<uint64_t, HingeMotorLimit> hinge_motor_limits;
 
 	HashMap<SensorPairKey, SensorPair, SensorPairKey> sensor_pairs;
 	LocalVector<PendingAreaEvent> pending_area_events;
