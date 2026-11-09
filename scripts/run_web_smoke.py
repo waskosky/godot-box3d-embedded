@@ -120,7 +120,7 @@ def main() -> int:
                     timeout=int(args.timeout * 1000),
                 )
                 deadline = started + args.timeout
-                while "RESULT: PASS" not in console_lines and not errors and time.monotonic() < deadline:
+                while "RESULT: PASS" not in console_lines and "RESULT: FAIL" not in console_lines and not errors and time.monotonic() < deadline:
                     page.wait_for_timeout(100)
                 passed = bool(response and response.ok) and all(required_checks(console_lines).values()) and not errors
                 loads.append({"load": attempt, "seconds_to_physics_pass": round(time.monotonic() - started, 3), "ok": passed})

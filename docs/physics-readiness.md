@@ -35,7 +35,8 @@ The native suite exercises actual Godot bodies and queries, including:
 - CCD against a thin wall, rotated off-center impulse/inertia, sleep/wake,
   sustained finite states and repeated body creation/removal.
 - Live material friction/restitution edits and rough/absorbent mixing; staged
-  hinge/slider setup, motor reversal, live limit changes and connected-node teardown.
+  hinge/slider setup, motor reversal, live limit changes, sleeping-body wake-up,
+  connected-node teardown and setters after native joint destruction.
 
 Run the complete native suite with a matching Godot executable:
 

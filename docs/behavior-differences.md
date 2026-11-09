@@ -100,3 +100,13 @@ inside this representation; it does not change that geometric limitation.
 Godot's joint API exposes parameters Box3D has no equivalent for, including `HingeJoint3D`'s `LIMIT_RELAXATION` and `LIMIT_SOFTNESS`, `PinJoint3D`'s `IMPULSE_CLAMP`, and most of `SliderJoint3D`'s per-axis tuning (Box3D's prismatic joint is a pure 1-DOF slider).
 
 Setting one logs a warning and is ignored, rather than silently mapping onto something that behaves differently.
+
+Supported live joint edits wake the constrained bodies, including motor reversal,
+limit edits, pin anchors and spring changes. Repeated identical writes leave
+sleeping bodies alone. Setters do not call through native handles destroyed when
+a connected body leaves its space.
+
+The current wrappers require two bodies; a single-body joint anchored to the
+world is not implemented. Hinge `MOTOR_MAX_IMPULSE` is still forwarded as Box3D's
+maximum torque, not a timestep-aware impulse conversion. Passing motor/limit
+movement checks does not establish matching motor strength across engines.

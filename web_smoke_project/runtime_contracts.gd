@@ -113,8 +113,10 @@ func _run() -> void:
 			slider_material.rough = true
 			slider_body.linear_velocity = Vector3(4, 0, 0)
 			joints_ok = rotor.rotation.z > 0.2 and rotor.rotation.z < 0.4 and carriage.position.x > 0.3 and carriage.position.x < 0.5
+			print("Live joints forward: hinge=", rotor.rotation.z, " slider=", carriage.position)
 			hinge.set_param(HingeJoint3D.PARAM_MOTOR_TARGET_VELOCITY, -2.0)
 			carriage.linear_velocity.x = -3.0
 	materials_ok = materials_ok and absf(slider_body.linear_velocity.x) < 0.2 and bounced[0] and not bounced[1]
 	joints_ok = joints_ok and rotor.rotation.z < -0.2 and rotor.rotation.z > -0.4 and carriage.position.x < -0.3 and carriage.position.x > -0.5
+	print("Live joints reverse: hinge=", rotor.rotation.z, " slider=", carriage.position)
 	complete = true
