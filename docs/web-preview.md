@@ -13,6 +13,54 @@ retain the original qualification. Preview 1 predates the large-surface fix.
 Documentation and regression-only follow-ups do not change the tested physics
 source or replace its artifact identity. Ordinary Web CI does not qualify static embedding.
 
+## Advancing readiness candidate (2026-11-09)
+
+Candidate `75ee90bcbb4484c54d426c4852e079db07f420ed` is on `integration/next`,
+not in preview 2's frozen binaries. It adds live material updates and Godot-style
+rough/absorbent mixing, joint setup/wake-up fixes, scaling diagnostics and macOS
+AddressSanitizer runtime CI. The focused upstream submissions are
+[#44](https://github.com/bearlikelion/godot-box3d/pull/44) and
+[#45](https://github.com/bearlikelion/godot-box3d/pull/45).
+
+On macOS 15.7.1 x86-64 with Godot 4.7, all 45 native tests pass both normally and
+with the adapter and Box3D instrumented by AddressSanitizer. The official engine
+and cached 4.3 godot-cpp archive are not instrumented. Runtime preload/init and
+the instrumented library were checked separately. This is not a leak-detector or
+whole-engine safety receipt. Both independent upstream branches also pass their
+36-test native suites against upstream's unchanged Box3D pin.
+
+A clean ordinary Release Web export of `75ee90b`, built with Emscripten 4.0.20
+and the existing 4.3 bindings archive, passes all 13 checks in local headless
+Chromium and Firefox. The added live material and joint scenarios finish inside
+the existing 180-frame movement window. They reproduced a sleeping hinge stuck
+at its old limit before the wake fix; native sleeping hinge, slider and pin
+regressions now cover that behavior too.
+
+The ordinary template hash remains
+`ffe2600af69db329d8a68f5a4872b8d00ae2e4b0536d3a789bf4ee8182b2cac9`;
+the candidate side module is
+`f1d0130c799029ed4d7717abc198ae97b56b54bf2e8e43fabc7c728918467dc0`.
+Chromium's first observation was 14.112 seconds; a separate three-load run
+passed in 35.618 / 34.226 / 30.070 seconds with a ten-second final observation.
+Firefox passed in 79.091 seconds. No errors were captured, and both final frames
+had readable text and visible geometry. These deliberately contended-host
+observations establish functionality, not startup improvement or hardware budgets.
+
+Matching static qualification is running separately in
+[this candidate's static workflow](https://github.com/waskosky/godot-box3d-embedded/actions/runs/42568959069).
+The [ordinary Web CI](https://github.com/waskosky/godot-box3d-embedded/actions/runs/42568954433)
+and two jobs in [native CI](https://github.com/waskosky/godot-box3d-embedded/actions/runs/42568954415)
+encountered HTTP 504 errors downloading Godot, before those jobs could test the
+candidate; an ordinary Web retry hit the same download failure. Those are not
+passing receipts. At this checkpoint, downstream `main` remains `6a4002c` and
+preview 2 remains unchanged. Require complete cross-platform and matching static
+results before promoting this candidate to the reviewed baseline.
+
+The [terrain diagnostic](heightmap-geometry.md#bounded-construction-diagnostic)
+records the bounded 65/129/257-grid construction measurements. Non-unit scaling,
+world-anchored joints, hinge motor impulse/torque conversion, debug-contact
+collection and hardware/device qualification remain separate work.
+
 ## Web preview 2 (2026-11-06)
 
 The release freezes the already-qualified `47cc6a0` source. Native editor

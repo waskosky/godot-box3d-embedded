@@ -102,8 +102,8 @@ Godot's joint API exposes parameters Box3D has no equivalent for, including `Hin
 Setting one logs a warning and is ignored, rather than silently mapping onto something that behaves differently.
 
 Supported live joint edits wake the constrained bodies, including motor reversal,
-limit edits, pin anchors and spring changes. Repeated identical writes leave
-sleeping bodies alone. Setters do not call through native handles destroyed when
+limit edits, pin anchors and spring changes. Repeated identical motor, limit,
+spring and anchor writes leave sleeping bodies alone. Setters do not call through native handles destroyed when
 a connected body leaves its space.
 
 The current wrappers require two bodies; a single-body joint anchored to the
