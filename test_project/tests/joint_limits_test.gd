@@ -18,22 +18,26 @@ func _run() -> void:
 	hinge.set_param(HingeJoint3D.PARAM_LIMIT_LOWER, -0.4)
 	hinge.set_param(HingeJoint3D.PARAM_LIMIT_UPPER, 0.4)
 	hinge.set_flag(HingeJoint3D.FLAG_USE_LIMIT, true)
-	hinge.set_param(HingeJoint3D.PARAM_MOTOR_MAX_IMPULSE, 100.0)
+	# Preserve the fixture's original 100 Nm strength at its default 60 Hz.
+	hinge.set_param(HingeJoint3D.PARAM_MOTOR_MAX_IMPULSE, 100.0 / 60.0)
 	hinge.set_param(HingeJoint3D.PARAM_MOTOR_TARGET_VELOCITY, 2.0)
 	hinge.set_flag(HingeJoint3D.FLAG_ENABLE_MOTOR, true)
 	for frame in 90:
 		await physics_frame
+	print("Hinge upper: ", rotor.rotation, " omega=", rotor.angular_velocity)
 	_check(rotor.rotation.z > 0.3 and rotor.rotation.z < 0.5, "hinge motor reaches and respects its upper limit")
 	rotor.sleeping = true
 	hinge.set_param(HingeJoint3D.PARAM_MOTOR_TARGET_VELOCITY, -2.0)
 	for frame in 90:
 		await physics_frame
+	print("Hinge lower: ", rotor.rotation, " omega=", rotor.angular_velocity)
 	_check(rotor.rotation.z < -0.3 and rotor.rotation.z > -0.5, "reversing a live motor reaches its lower limit")
 	hinge.set_flag(HingeJoint3D.FLAG_ENABLE_MOTOR, false)
 	hinge.set_flag(HingeJoint3D.FLAG_USE_LIMIT, false)
 	rotor.angular_velocity = Vector3(0, 0, 1)
 	for frame in 45:
 		await physics_frame
+	print("Hinge free: ", rotor.rotation, " omega=", rotor.angular_velocity)
 	_check(rotor.rotation.z > 0.1, "disabling the live hinge limit allows free rotation")
 	hinge.free()
 	rotor.free()
