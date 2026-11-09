@@ -51,6 +51,7 @@ b3ShapeId create_box3d_shape(
 	def.baseMaterial = box3d_surface_material(p_friction, p_restitution);
 
 	const Transform3D& local = p_instance.get_transform();
+	box3d_warn_if_scaled(local.basis);
 
 	switch (type) {
 		case PhysicsServer3D::SHAPE_SEPARATION_RAY:

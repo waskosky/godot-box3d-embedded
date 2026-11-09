@@ -6,11 +6,18 @@
 #include <godot_cpp/variant/quaternion.hpp>
 #include <godot_cpp/variant/transform3d.hpp>
 #include <godot_cpp/variant/vector3.hpp>
+#include <godot_cpp/core/error_macros.hpp>
 
 #include <box3d/math_functions.h>
 #include <box3d/types.h>
 
 using namespace godot;
+
+inline void box3d_warn_if_scaled(const Basis& p_basis) {
+	if (!p_basis.is_rotation()) {
+		WARN_PRINT_ONCE("Box3D: scaled, mirrored or sheared collision transforms are not consistently supported. Use unit-scale transforms and change dimensions on the Shape3D resource instead.");
+	}
+}
 
 // Box3D is built in single precision (no BOX3D_DOUBLE_PRECISION), so b3Pos/b3WorldTransform
 // are plain typedefs of b3Vec3/b3Transform. All conversions below operate directly on
@@ -43,6 +50,7 @@ _FORCE_INLINE_ Transform3D b3_to_godot(const b3Transform& p_t) {
 }
 
 _FORCE_INLINE_ b3Transform godot_to_b3_transform(const Transform3D& p_t) {
+	box3d_warn_if_scaled(p_t.basis);
 	b3Transform t;
 	t.p = godot_to_b3(p_t.origin);
 	t.q = godot_to_b3(p_t.basis.get_rotation_quaternion());

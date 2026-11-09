@@ -16,6 +16,7 @@ Box3DShapeProxy3D::Box3DShapeProxy3D(const Box3DShapeImpl3D* p_shape, const Tran
 	if (p_shape == nullptr) {
 		return;
 	}
+	box3d_warn_if_scaled(p_transform.basis);
 	const float margin = MAX(0.0f, (float)p_margin);
 
 	switch (p_shape->get_type()) {
