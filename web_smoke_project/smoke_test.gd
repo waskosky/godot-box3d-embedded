@@ -263,6 +263,29 @@ func _check_direct_queries() -> bool:
     ray.hit_back_faces = true
     var hit := state.intersect_ray(ray)
     ok = ok and hit.get("face_index", -1) >= 0 and hit.get("normal", Vector3.ZERO).distance_to(Vector3.LEFT) < 0.01
+    return ok and _check_live_query_filters()
+
+
+func _check_live_query_filters() -> bool:
+    var state := get_world_3d().direct_space_state
+    var ok := true
+    for areas in [false, true]:
+        var target: CollisionObject3D = Area3D.new() if areas else StaticBody3D.new()
+        target.position = Vector3(60 if areas else 64, 0, 0)
+        target.collision_layer = 0
+        target.collision_mask = 0
+        target.add_child(_box_collision(Vector3.ONE))
+        add_child(target)
+        var ray := PhysicsRayQueryParameters3D.create(target.position + Vector3.UP * 3, target.position - Vector3.UP * 3, 64)
+        ray.collide_with_bodies = not areas
+        ray.collide_with_areas = areas
+        target.collision_layer = 64
+        ok = ok and state.intersect_ray(ray).get("collider") == target
+        target.collision_layer = 128
+        ok = ok and state.intersect_ray(ray).is_empty()
+        ray.collision_mask = 128
+        ok = ok and state.intersect_ray(ray).get("collider") == target
+        target.free()
     return ok
 
 
