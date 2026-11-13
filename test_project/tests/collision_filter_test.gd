@@ -10,6 +10,7 @@ func _initialize() -> void:
 func _run() -> void:
 	_check(ProjectSettings.get_setting("physics/3d/physics_engine", "") == "Box3D Physics", "test project requests the Box3D backend")
 	_check(ClassDB.class_exists(&"Box3DPhysicsServer3D"), "Box3D extension is loaded")
+	_check(PhysicsServer3D.get_class() == &"Box3DPhysicsServer3D", "the active server is Box3D")
 	if failures > 0:
 		quit(1)
 		return
@@ -35,6 +36,7 @@ func _run() -> void:
 	query.collision_mask = 4
 	var hit: Dictionary = root.world_3d.direct_space_state.intersect_ray(query)
 	_check(not hit.is_empty(), "direct queries match a target layer regardless of the target mask")
+	await _verify_live_filters()
 
 	accepts_floor.queue_free()
 	floor_accepts.queue_free()
@@ -44,6 +46,60 @@ func _run() -> void:
 	else:
 		print("RESULT: FAIL - ", failures, " collision filter assertion(s) failed")
 	quit(1 if failures > 0 else 0)
+
+
+func _verify_live_filters() -> void:
+	var target := _make_floor(Vector3(20, 0, 0), 0, 0)
+	var area := Area3D.new()
+	area.position = Vector3(24, 0, 0)
+	area.collision_layer = 0
+	area.collision_mask = 0
+	var area_collision := CollisionShape3D.new()
+	area_collision.shape = BoxShape3D.new()
+	area.add_child(area_collision)
+	root.add_child(area)
+	await physics_frame
+	# These shapes already exist: a property edit must refilter them in place.
+	target.collision_layer = 4
+	area.collision_layer = 4
+	await physics_frame
+	_check(_ray_matches(target, 4, false), "live body layer enables an existing shape")
+	_check(_ray_matches(area, 4, true), "live area layer enables an existing sensor")
+	target.collision_layer = 8
+	area.collision_layer = 8
+	await physics_frame
+	_check(not _ray_matches(target, 4, false) and _ray_matches(target, 8, false), "live body layer removes the old query category")
+	_check(not _ray_matches(area, 4, true) and _ray_matches(area, 8, true), "live area layer removes the old query category")
+	var collision := target.get_child(0) as CollisionShape3D
+	collision.disabled = true
+	target.collision_layer = 16
+	collision.disabled = false
+	await physics_frame
+	_check(_ray_matches(target, 16, false), "disabled attachments retain the next filter")
+	# Only the floor accepts this body; changing its mask must create and remove
+	# the actual contact pair, independently of query-mask semantics.
+	var floor_body := _make_floor(Vector3(28, -0.5, 0), 1, 0)
+	floor_body.collision_mask = 2
+	var body := _make_body(Vector3(28, 3, 0), 2, 0)
+	for frame in 150:
+		await physics_frame
+	_check(body.position.y > -1.0, "live body mask creates contact pairs")
+	floor_body.collision_mask = 0
+	body.sleeping = false
+	for frame in 120:
+		await physics_frame
+	_check(body.position.y < -5.0, "live body mask removes contact pairs")
+	target.free()
+	area.free()
+	floor_body.free()
+	body.free()
+
+
+func _ray_matches(target: CollisionObject3D, mask: int, areas: bool) -> bool:
+	var query := PhysicsRayQueryParameters3D.create(target.position + Vector3.UP * 3, target.position - Vector3.UP * 3, mask)
+	query.collide_with_bodies = not areas
+	query.collide_with_areas = areas
+	return root.world_3d.direct_space_state.intersect_ray(query).get("collider") == target
 
 
 func _make_floor(position: Vector3, layer: int, mask: int) -> StaticBody3D:

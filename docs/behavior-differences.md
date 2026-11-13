@@ -28,6 +28,12 @@ If you need a body to be detected by an area, give it a convex shape. A trimesh 
 
 ## Direct query contacts and rays
 
+Changing a body's or area's collision layer or mask refilters its existing native
+shapes in place. It does not recreate the body or its attachments. Disabled or
+detached attachments use the current filter when they are enabled or attached.
+Query masks continue to compare against the target layer independently of the
+target mask; contact pairs retain Godot's either-object acceptance semantics.
+
 `collide_shape()` uses native contact manifolds for convex queries against live
 primitive, mesh and heightmap fixtures. It returns world-space pairs with the
 query-surface point first and target-surface point second. Overlapping pairs
