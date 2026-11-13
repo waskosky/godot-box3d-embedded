@@ -271,7 +271,7 @@ void Box3DShapedObjectImpl3D::_update_shape_filters() {
 	const b3Filter filter = godot_to_b3_filter(collision_layer, collision_mask);
 	for (const auto& instance : shapes) {
 		if (instance.has_shape_id()) {
-			b3Shape_SetFilter(instance.get_shape_id(), filter);
+			b3Shape_SetFilter(instance.get_shape_id(), filter, true);
 		}
 	}
 }
