@@ -53,7 +53,9 @@ the absence of one. Browser JS heap does not include all native/GPU memory.
 An unavailable release-build memory/timing monitor is not a measured zero cost.
 
 The result's `ok` covers bounded physics and cleanup only. Hardware timing is
-eligible only for a headed browser with an identified hardware renderer. Choose
+eligible only for a headed browser with an identified hardware renderer. A masked
+Firefox renderer such as "Radeon R9 200 Series, or similar" is not a device GPU
+identity and is excluded even when the browser is headed. Choose
 the target's frame/startup/memory budget before comparing performance; there is
 no universal FPS assertion. This desktop workload does not establish physical
 phone, multiplayer, whole-game or arbitrary large-terrain acceptance.

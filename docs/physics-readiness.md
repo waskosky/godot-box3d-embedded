@@ -38,6 +38,8 @@ The native suite exercises actual Godot bodies and queries, including:
   hole-boundary falls and moving/rotating platform jump detachment.
 - CCD against a thin wall, rotated off-center impulse/inertia, sleep/wake,
   sustained finite states and repeated body creation/removal.
+- Separate coplanar terrain tiles in both directions on floors, walls and
+  ceilings, with continuous-mesh controls and bounded support height.
 - Live material friction/restitution edits and rough/absorbent mixing; staged
   hinge/slider setup, motor reversal, live limit changes, sleeping-body wake-up,
   connected-node teardown and setters after native joint destruction.
@@ -74,6 +76,13 @@ or implicitly declared supported. The [behavior notes](behavior-differences.md)
 also explain finite world boundaries and material migration.
 
 ## Remaining acceptance gates
+
+The [extended CCD reproduction](edge-qualification.md#thin-hull-ccd-is-an-open-engine-defect)
+is a confirmed native-engine failure, not a passing regression. It is retained
+as `test_project/benchmarks/ccd_geometry_probe.gd` and a standalone C reproduction.
+The initial 50-test candidate fails this case in CI; the normal suite's 49
+passing checks do not certify it. A native fix and matching native/Web
+qualification are needed before claiming high-speed thin-hull CCD acceptance.
 
 1. Test physical Android and iPhone/Safari devices, including repeated scene
    reloads and background/resume. Desktop WebKit is only a browser sanity check.

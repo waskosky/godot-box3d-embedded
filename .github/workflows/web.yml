@@ -201,7 +201,8 @@ jobs:
 
   release:
     needs: package
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    # Embedded previews retain their separately qualified native/Web assets.
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && !contains(github.ref_name, '-embedded.')
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     permissions:

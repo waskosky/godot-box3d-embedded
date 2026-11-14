@@ -8,6 +8,11 @@ We maintain static embedding into custom Godot Web templates, application execut
 
 **Status: experimental.** Passing regressions establish a development baseline. Device support, startup latency, sustained frame pacing, and memory budgets require qualification for the application using the backend. See [physics readiness](docs/physics-readiness.md) and [release qualification](docs/release-qualification.md).
 
+**Known CCD issue:** a fast sphere can cross a thin box at 30 Hz even with
+continuous collision enabled. This reproduces in standalone Box3D, including
+the older upstream engine pin; static Web embedding is not exempt. See the
+[focused reproduction and limits](docs/edge-qualification.md#thin-hull-ccd-is-an-open-engine-defect).
+
 ## Try the prebuilt Web preview
 
 Use **Godot 4.7** with [Web preview 4](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.4). Install its [native editor addon](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.4/godot-box3d-embedded-native-editor.zip) by copying `addons/godot-box3d/` into your project, then select **Box3D Physics** and the Compatibility renderer.
