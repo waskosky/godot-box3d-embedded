@@ -86,12 +86,10 @@ struct TriangleContext {
 	b3Transform target_to_query;
 	b3Transform query_transform;
 	float margin;
-	const b3MeshData* mesh;
-	const b3HeightFieldData* height_field;
 	godot::LocalVector<Box3DRecoveryContact>* contacts;
 };
 
-bool triangle_contact(b3Vec3 p_a, b3Vec3 p_b, b3Vec3 p_c, int p_index, void* p_context) {
+bool triangle_contact(b3Vec3 p_a, b3Vec3 p_b, b3Vec3 p_c, int, void* p_context) {
 	auto& ctx = *static_cast<TriangleContext*>(p_context);
 	const b3Vec3 triangle[] = {b3TransformPoint(ctx.target_to_query, p_a),
 			b3TransformPoint(ctx.target_to_query, p_b), b3TransformPoint(ctx.target_to_query, p_c)};
@@ -106,9 +104,7 @@ bool triangle_contact(b3Vec3 p_a, b3Vec3 p_b, b3Vec3 p_c, int p_index, void* p_c
 	} else if (query.type == b3_capsuleShape) {
 		b3CollideTriangleAndCapsule(&manifold, 32, triangle, &query.capsule, &simplex_cache);
 	} else if (query.type == b3_hullShape) {
-		const uint8_t* flags = ctx.mesh ? b3GetMeshFlags(ctx.mesh) : b3GetHeightFieldFlags(ctx.height_field);
-		const int triangle_flags = flags ? flags[p_index] : 0;
-		b3CollideTriangleAndHull(&manifold, 32, triangle[0], triangle[1], triangle[2], triangle_flags, query.hull, &sat_cache, true);
+		b3CollideTriangleAndHull(&manifold, 32, triangle[0], triangle[1], triangle[2], query.hull, &sat_cache, true);
 	}
 	const uint32_t count_before = ctx.contacts->size();
 	append_manifold(manifold, ctx.query_transform, false, ctx.margin, *ctx.contacts);
@@ -204,14 +200,12 @@ void geometry_contacts(const Geometry& query, b3Transform p_query_transform,
 		const b3Vec3 inflation{radius, radius, radius};
 		const b3AABB bounds{b3Sub(lower, inflation), b3Add(upper, inflation)};
 		TriangleContext ctx{&query, b3InvMulTransforms(p_query_transform, target_transform), p_query_transform,
-				p_margin, nullptr, nullptr, &r_contacts};
+				p_margin, &r_contacts};
 		if (target.type == b3_meshShape) {
 			const b3Mesh mesh = b3Shape_GetMesh(p_target);
-			ctx.mesh = mesh.data;
 			b3QueryMesh(&mesh, bounds, triangle_contact, &ctx);
 		} else {
-			ctx.height_field = b3Shape_GetHeightField(p_target);
-			b3QueryHeightField(ctx.height_field, bounds, triangle_contact, &ctx);
+			b3QueryHeightField(b3Shape_GetHeightField(p_target), bounds, triangle_contact, &ctx);
 		}
 		return;
 	}

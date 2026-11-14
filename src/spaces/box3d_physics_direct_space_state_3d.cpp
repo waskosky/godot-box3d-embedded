@@ -157,13 +157,7 @@ struct RayContext {
 };
 
 int32_t input_face_index(b3ShapeId p_shape_id, Box3DShapedObjectImpl3D* p_object, int p_triangle) {
-	const int32_t slot = p_object->find_shape_index(p_shape_id);
-	if (p_triangle < 0 || slot < 0 || p_object->get_shape(slot)->get_type() != PhysicsServer3D::SHAPE_CONCAVE_POLYGON) {
-		return -1;
-	}
-	const b3Mesh mesh = b3Shape_GetMesh(p_shape_id);
-	// The BVH reorders triangles. Unwelded vertices keep their input face groups.
-	return b3GetMeshTriangles(mesh.data)[p_triangle].index1 / 3;
+	return p_object->get_input_face_index(p_shape_id, p_triangle);
 }
 
 float cast_result_fcn(b3ShapeId p_shape_id, b3Pos p_point, b3Vec3 p_normal, float p_fraction, uint64_t, int p_triangle, int, void* p_context) {

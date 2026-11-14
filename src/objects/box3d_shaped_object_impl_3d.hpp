@@ -58,6 +58,8 @@ public:
 
 	int32_t find_shape_index(b3ShapeId p_shape_id) const;
 
+	int32_t get_input_face_index(b3ShapeId p_shape_id, int32_t p_triangle) const;
+
 	bool has_shape_id(int32_t p_index) const;
 
 	void set_shape_transform(int32_t p_index, const Transform3D& p_transform);

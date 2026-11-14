@@ -1,6 +1,7 @@
 #pragma once
 
 #include <godot_cpp/variant/transform3d.hpp>
+#include <godot_cpp/templates/local_vector.hpp>
 
 #include <box3d/id.h>
 
@@ -49,13 +50,25 @@ public:
 	// Set when a trimesh instance needs its local transform baked into its own mesh copy.
 	b3MeshData* get_owned_mesh() const { return owned_mesh; }
 
-	void set_owned_mesh(b3MeshData* p_mesh) { owned_mesh = p_mesh; }
+	void set_owned_mesh(b3MeshData* p_mesh) {
+		owned_mesh = p_mesh;
+		if (p_mesh == nullptr) {
+			owned_mesh_input_faces.clear();
+		}
+	}
+
+	LocalVector<int32_t>& get_owned_mesh_input_faces() { return owned_mesh_input_faces; }
+
+	int32_t get_owned_mesh_input_face(int32_t p_triangle) const {
+		return p_triangle >= 0 && (uint32_t)p_triangle < owned_mesh_input_faces.size() ? owned_mesh_input_faces[p_triangle] : -1;
+	}
 
 private:
 	Box3DShapeImpl3D* shape = nullptr;
 	Transform3D transform;
 	b3ShapeId shape_id = b3_nullShapeId;
 	b3MeshData* owned_mesh = nullptr;
+	LocalVector<int32_t> owned_mesh_input_faces;
 	uint32_t index = 0;
 	bool disabled = false;
 };

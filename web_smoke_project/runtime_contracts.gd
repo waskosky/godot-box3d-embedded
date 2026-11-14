@@ -5,6 +5,7 @@ var complete: bool = false
 var materials_ok: bool = true
 var joints_ok: bool = true
 var hinge_impulse_ok: bool = false
+var mesh_contacts_ok: bool = false
 
 
 func _ready() -> void:
@@ -21,6 +22,7 @@ func _box(size: Vector3) -> CollisionShape3D:
 
 
 func _run() -> void:
+	var mesh_bodies: Array[RigidBody3D] = _mesh_contract()
 	var floor_body: StaticBody3D = StaticBody3D.new()
 	floor_body.position.y = -0.5
 	floor_body.collision_layer = 128
@@ -123,6 +125,8 @@ func _run() -> void:
 		for index in balls.size():
 			bounced[index] = bounced[index] or balls[index].linear_velocity.y > 2.0
 		if frame == 10:
+			for index in range(1, mesh_bodies.size()):
+				mesh_bodies[index].linear_velocity = Basis(Vector3.UP, 0.14) * Vector3(3, 0, 0)
 			initial_spin = weak_rotor.angular_velocity.z
 			slider_body.linear_velocity = Vector3(4, 0, 0)
 			ball_materials[0].bounce = 0.8
@@ -143,4 +147,58 @@ func _run() -> void:
 	materials_ok = materials_ok and absf(slider_body.linear_velocity.x) < 0.2 and bounced[0] and not bounced[1]
 	joints_ok = joints_ok and rotor.rotation.z < -0.2 and rotor.rotation.z > -0.4 and carriage.position.x < -0.3 and carriage.position.x > -0.5
 	print("Live joints reverse: hinge=", rotor.rotation.z, " slider=", carriage.position)
+	mesh_contacts_ok = absf(mesh_bodies[0].position.y - 0.5) < 0.04
+	for index in range(1, mesh_bodies.size()):
+		var local: Vector3 = Basis(Vector3.UP, -0.14) * (mesh_bodies[index].position - Vector3(0, 0, 30))
+		mesh_contacts_ok = mesh_contacts_ok and local.x > 1.8 and absf(local.y - 0.5) < 0.08
 	complete = true
+
+
+func _mesh_contract() -> Array[RigidBody3D]:
+	var bodies: Array[RigidBody3D] = []
+	for floor_index in range(2):
+		var floor_body: StaticBody3D = StaticBody3D.new()
+		floor_body.position.z = 20 + floor_index * 10
+		floor_body.rotation.y = 0.14 if floor_index == 1 else 0
+		floor_body.collision_layer = 256
+		floor_body.collision_mask = 256
+		var faces: PackedVector3Array = PackedVector3Array()
+		var cells: int = 64 if floor_index == 0 else 12
+		var size: float = 2.0 if floor_index == 0 else 12.0
+		for z in range(cells):
+			for x in range(cells):
+				var a: Vector3 = Vector3(size * (float(x) / cells - 0.5), 0, size * (float(z) / cells - 0.5))
+				var b: Vector3 = a + Vector3(size / cells, 0, 0)
+				var c: Vector3 = a + Vector3(0, 0, size / cells)
+				var d: Vector3 = a + Vector3(size / cells, 0, size / cells)
+				faces.append_array(PackedVector3Array([a, b, c, b, d, c]))
+		var mesh: ConcavePolygonShape3D = ConcavePolygonShape3D.new()
+		mesh.set_faces(faces)
+		var collision: CollisionShape3D = CollisionShape3D.new()
+		collision.shape = mesh
+		floor_body.add_child(collision)
+		add_child(floor_body)
+	for index in range(3):
+		var body: RigidBody3D = RigidBody3D.new()
+		body.position = Vector3(0, 1.25, 20) if index == 0 else Basis(Vector3.UP, 0.14) * Vector3(-4, 0.51, -1 if index == 1 else 1) + Vector3(0, 0, 30)
+		body.lock_rotation = true
+		body.can_sleep = false
+		body.collision_layer = 256
+		body.collision_mask = 256
+		var material: PhysicsMaterial = PhysicsMaterial.new()
+		material.friction = 0
+		body.physics_material_override = material
+		var collision: CollisionShape3D = CollisionShape3D.new()
+		if index == 0:
+			collision.shape = SphereShape3D.new()
+		elif index == 1:
+			var capsule: CapsuleShape3D = CapsuleShape3D.new()
+			capsule.radius = 0.25
+			capsule.height = 1.0
+			collision.shape = capsule
+		else:
+			collision.shape = BoxShape3D.new()
+		body.add_child(collision)
+		add_child(body)
+		bodies.append(body)
+	return bodies

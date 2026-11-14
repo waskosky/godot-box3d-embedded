@@ -10,6 +10,7 @@ func _initialize() -> void:
 func _run() -> void:
 	await _inside_hits()
 	await _mesh_hits()
+	await _shared_mesh_faces()
 	await _heightmap_hits()
 	if failures == 0:
 		print("RESULT: PASS - ray inside/backface flags, input face indices and filtering")
@@ -103,6 +104,57 @@ func _mesh_hits() -> void:
 	await physics_frame
 	_check(state.intersect_ray(back).is_empty(), "the concave resource must also enable backface collision")
 	terrain.queue_free()
+	await process_frame
+	await physics_frame
+
+
+func _shared_mesh_faces() -> void:
+	# Adjacent triangles share vertices; a discarded degenerate input face must
+	# still count in Godot's face indices. Test both shared and baked mesh copies.
+	var first: PackedVector3Array = PackedVector3Array([
+		Vector3(-1, 0, -1), Vector3(1, 0, -1), Vector3(-1, 0, 1),
+	])
+	var second: PackedVector3Array = PackedVector3Array([
+		Vector3(1, 0, -1), Vector3(1, 0, 1), Vector3(-1, 0, 1),
+	])
+	var mesh: ConcavePolygonShape3D = ConcavePolygonShape3D.new()
+	mesh.backface_collision = true
+	var bodies: Array[StaticBody3D] = []
+	var collisions: Array[CollisionShape3D] = []
+	for index in range(2):
+		var body: StaticBody3D = StaticBody3D.new()
+		body.position = Vector3(40 + index * 6, 0, 0)
+		body.rotation.z = 0.2
+		var collision: CollisionShape3D = CollisionShape3D.new()
+		if index == 1:
+			collision.position = Vector3(0.25, 0.3, -0.2)
+			collision.rotation.x = 0.3
+		collision.shape = mesh
+		body.add_child(collision)
+		root.add_child(body)
+		bodies.append(body)
+		collisions.append(collision)
+	for edit in range(2):
+		var faces: PackedVector3Array = PackedVector3Array([Vector3.ZERO, Vector3.ZERO, Vector3.ZERO])
+		faces.append_array(first if edit == 0 else second)
+		faces.append_array(second if edit == 0 else first)
+		mesh.set_faces(faces)
+		await physics_frame
+		await physics_frame
+		for index in range(bodies.size()):
+			var transform: Transform3D = bodies[index].global_transform * collisions[index].transform
+			var point: Vector3 = transform * Vector3(0.5, 0, 0.5)
+			var normal: Vector3 = transform.basis * Vector3.UP
+			var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(point + normal, point - normal)
+			var hit: Dictionary = root.world_3d.direct_space_state.intersect_ray(query)
+			_check(hit.get("collider") == bodies[index] and hit.get("face_index", -1) == (2 if edit == 0 else 1),
+					"adjacency preserves input face after degenerate removal, baking and live edits")
+			query.from = point - normal
+			query.to = point + normal
+			hit = root.world_3d.direct_space_state.intersect_ray(query)
+			_check(hit.get("face_index", -1) == (2 if edit == 0 else 1), "backface fallback preserves the same input face")
+	for body in bodies:
+		body.queue_free()
 	await process_frame
 	await physics_frame
 

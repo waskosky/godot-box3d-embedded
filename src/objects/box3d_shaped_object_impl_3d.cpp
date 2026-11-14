@@ -131,7 +131,7 @@ b3ShapeId create_box3d_shape(
 				return b3CreateMeshShape(p_body_id, &def, mesh, b3Vec3{1.0f, 1.0f, 1.0f});
 			}
 
-			b3MeshData* baked = Box3DConcavePolygonShapeImpl3D::build_mesh(mesh_shape->get_faces(), local);
+			b3MeshData* baked = Box3DConcavePolygonShapeImpl3D::build_mesh(mesh_shape->get_faces(), local, &p_instance.get_owned_mesh_input_faces());
 			if (baked == nullptr) {
 				return b3_nullShapeId;
 			}
@@ -361,6 +361,18 @@ int32_t Box3DShapedObjectImpl3D::find_shape_index(b3ShapeId p_shape_id) const {
 bool Box3DShapedObjectImpl3D::has_shape_id(int32_t p_index) const {
 	ERR_FAIL_INDEX_V(p_index, (int32_t)shapes.size(), false);
 	return shapes[p_index].has_shape_id();
+}
+
+int32_t Box3DShapedObjectImpl3D::get_input_face_index(b3ShapeId p_shape_id, int32_t p_triangle) const {
+	const int32_t index = find_shape_index(p_shape_id);
+	if (index < 0 || p_triangle < 0 || shapes[index].get_shape()->get_type() != PhysicsServer3D::SHAPE_CONCAVE_POLYGON) {
+		return -1;
+	}
+	const Box3DShapeInstance3D& instance = shapes[index];
+	if (instance.get_owned_mesh() != nullptr) {
+		return instance.get_owned_mesh_input_face(p_triangle);
+	}
+	return static_cast<Box3DConcavePolygonShapeImpl3D*>(instance.get_shape())->get_input_face_index(p_triangle);
 }
 
 void Box3DShapedObjectImpl3D::set_shape_transform(int32_t p_index, const Transform3D& p_transform) {

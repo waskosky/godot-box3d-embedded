@@ -30,13 +30,19 @@ public:
 	const PackedVector3Array& get_faces() const { return faces; }
 	bool is_backface_collision_enabled() const { return backface_collision; }
 
+	int32_t get_input_face_index(int32_t p_triangle) const {
+		return p_triangle >= 0 && (uint32_t)p_triangle < input_faces.size() ? input_faces[p_triangle] : -1;
+	}
+
 	// Box3D meshes carry no transform, so an offset instance needs its own baked copy.
-	static b3MeshData* build_mesh(const PackedVector3Array& p_faces, const Transform3D& p_transform);
+	static b3MeshData* build_mesh(const PackedVector3Array& p_faces, const Transform3D& p_transform,
+			LocalVector<int32_t>* p_input_faces = nullptr);
 
 private:
 	void _rebuild_mesh();
 
 	PackedVector3Array faces;
+	LocalVector<int32_t> input_faces;
 	b3MeshData* mesh = nullptr;
 	AABB aabb;
 	bool backface_collision = false;
