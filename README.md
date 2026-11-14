@@ -25,6 +25,7 @@ An unchanged motor cap now permits 60 times the previous maximum torque at
 `max_impulse = desired_torque * physics_step_seconds`. Scaling remains unsupported;
 the new warnings do not add scaling support. Preview 3 retains the same pinned
 Box3D version; newer terrain-engine experiments are not part of its binaries.
+Preview 3 also retains [known dense-mesh and internal-edge contact limitations](docs/behavior-differences.md#mesh-contact-limits-in-preview-3).
 
 ## Choose a Web build
 

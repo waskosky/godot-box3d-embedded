@@ -20,6 +20,9 @@ live material updates and Godot-style mixing, staged joint setup and wake-up
 fixes, corrected hinge impulse units, scaling warnings and ASan runtime CI.
 It retains the original-maintainer Box3D pin `f36d061`; the newer mesh/terrain
 dependency experiment is separate and is not included in this release.
+In particular, preview 3 retains the old 512-triangle per-convex-body contact
+cache and mesh-edge snagging reproduced by the new candidate's focused tests.
+The general smoke does not cover those cases; see [mesh contact limits](behavior-differences.md#mesh-contact-limits-in-preview-3).
 
 The [native pipeline](https://github.com/waskosky/godot-box3d-embedded/actions/runs/43416087425)
 passes all 46 tests on Linux x86-64, Windows x86-64 and universal macOS, plus
