@@ -44,6 +44,7 @@ def required_checks(lines: list[str]) -> dict[str, bool]:
         "live_joints": "Live hinge/slider constraints: PASS" in lines,
         "hinge_impulse": "Hinge motor impulse budget: PASS" in lines,
         "mesh_contacts": "Mesh seam/dense contacts: PASS" in lines,
+        "world_joints": "World-anchored pin/hinge/slider: PASS" in lines,
         "physics": "RESULT: PASS" in lines,
     }
 

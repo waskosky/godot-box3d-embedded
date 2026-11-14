@@ -6,11 +6,69 @@ var materials_ok: bool = true
 var joints_ok: bool = true
 var hinge_impulse_ok: bool = false
 var mesh_contacts_ok: bool = false
+var world_joints_ok: bool = false
 
 
 func _ready() -> void:
 	position.x = 70
+	_world_joint_contract()
 	_run()
+
+
+func _world_joint_contract() -> void:
+	var bodies: Array[RigidBody3D] = []
+	var joints: Array[Joint3D] = []
+	var frames: Array[Transform3D] = []
+	for kind in 3:
+		var body := RigidBody3D.new()
+		body.position = Vector3(kind * 4, 5, 40)
+		body.rotation.y = 0.6
+		body.gravity_scale = 0.0
+		body.can_sleep = false
+		body.collision_layer = 0
+		body.collision_mask = 0
+		body.add_child(_box(Vector3.ONE))
+		add_child(body)
+		var joint: Joint3D
+		if kind == 0:
+			joint = PinJoint3D.new()
+		elif kind == 1:
+			joint = HingeJoint3D.new()
+		else:
+			joint = SliderJoint3D.new()
+		joint.transform = body.transform
+		add_child(joint)
+		joint.node_b = joint.get_path_to(body)
+		if kind == 1:
+			joint.set_param(HingeJoint3D.PARAM_LIMIT_LOWER, -0.2)
+			joint.set_param(HingeJoint3D.PARAM_LIMIT_UPPER, 0.35)
+			joint.set_flag(HingeJoint3D.FLAG_USE_LIMIT, true)
+			joint.set_param(HingeJoint3D.PARAM_MOTOR_MAX_IMPULSE, 1.0)
+			joint.set_param(HingeJoint3D.PARAM_MOTOR_TARGET_VELOCITY, 2.0)
+			joint.set_flag(HingeJoint3D.FLAG_ENABLE_MOTOR, true)
+		elif kind == 2:
+			joint.set_param(SliderJoint3D.PARAM_LINEAR_LIMIT_LOWER, -0.4)
+			joint.set_param(SliderJoint3D.PARAM_LINEAR_LIMIT_UPPER, 0.4)
+		bodies.append(body)
+		joints.append(joint)
+		frames.append(body.global_transform)
+	await get_tree().physics_frame
+	for index in bodies.size():
+		bodies[index].apply_central_impulse(frames[index].basis * Vector3(3, 2, 1))
+	var ok := true
+	for frame in 150:
+		await get_tree().physics_frame
+		if frame == 70:
+			var hinge_relative := frames[1].affine_inverse() * bodies[1].global_transform
+			var slider_relative := frames[2].affine_inverse() * bodies[2].global_transform
+			ok = bodies[0].global_position.distance_to(frames[0].origin) < 0.04 and absf(hinge_relative.basis.get_euler().z + 0.35) < 0.04 and absf(slider_relative.origin.x - 0.4) < 0.04
+			PhysicsServer3D.pin_joint_set_local_b(joints[0].get_rid(), frames[0].origin + Vector3.UP)
+			joints[1].set_param(HingeJoint3D.PARAM_MOTOR_TARGET_VELOCITY, -2.0)
+			bodies[2].apply_central_impulse(frames[2].basis * Vector3(-8, 0, 0))
+	var hinge_relative := frames[1].affine_inverse() * bodies[1].global_transform
+	var slider_relative := frames[2].affine_inverse() * bodies[2].global_transform
+	world_joints_ok = ok and bodies[0].global_position.distance_to(frames[0].origin + Vector3.UP) < 0.04 and hinge_relative.origin.length() < 0.04 and absf(hinge_relative.basis.get_euler().z - 0.2) < 0.04 and absf(slider_relative.origin.x + 0.4) < 0.04 and Vector2(slider_relative.origin.y, slider_relative.origin.z).length() < 0.04
+	print("World joints: pin=", bodies[0].global_position, " hinge=", hinge_relative.basis.get_euler(), " slider=", slider_relative.origin)
 
 
 func _box(size: Vector3) -> CollisionShape3D:
