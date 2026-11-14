@@ -579,6 +579,10 @@ func _run_checks() -> void:
         failures.append("Hinge motor impulse budget failed")
     var mesh_contacts_ok: bool = _runtime_contracts.complete and _runtime_contracts.mesh_contacts_ok
     _append_status("Mesh seam/dense contacts: %s" % ("PASS" if mesh_contacts_ok else "FAIL"))
+    var world_joints_ok: bool = _runtime_contracts.world_joints_ok
+    _append_status("World-anchored pin/hinge/slider: %s" % ("PASS" if world_joints_ok else "FAIL"))
+    if not world_joints_ok:
+        failures.append("World-anchored joint contract failed")
     if not mesh_contacts_ok:
         failures.append("Mesh seam/dense contact support failed")
     if not materials_ok or not joints_ok:

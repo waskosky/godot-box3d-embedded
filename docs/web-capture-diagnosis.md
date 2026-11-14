@@ -31,6 +31,12 @@ WebKit 26.4 now launches locally, but its ordinary physics run fails during
 Godot GLES3 scene/canvas vertex-shader compilation, before physics acceptance.
 That is a failed WebKit qualification, not a passing backend startup and not
 evidence of a Box3D solver defect.
+The full fixture with official templates and GodotPhysics, without Box3D,
+reproduces the same scene/canvas shader errors. The official-template Box3D
+control can print physics PASS when allowed to continue despite those errors;
+the overall run still fails. A simple label-only control renders, and headed
+WebKit also fails the full fixture. This is not merely a browser-launch failure
+and has not been isolated to a particular renderer/driver defect.
 
 ## Bounded investigation, November 14
 

@@ -128,8 +128,20 @@ limit edits, pin anchors and spring changes. Repeated identical motor, limit,
 spring and anchor writes leave sleeping bodies alone. Setters do not call through native handles destroyed when
 a connected body leaves its space.
 
-The current wrappers require two bodies; a single-body joint anchored to the
-world is not implemented.
+Pin, hinge and slider joints support one body anchored to the world. Leave either
+Joint3D body NodePath empty; the remaining body is server endpoint A. In direct
+server calls, supply a valid body A and an empty body B RID, and express frame B
+in world coordinates. Each space lazily owns one shapeless static endpoint, not
+one hidden body per joint. Construction before space attachment is deferred;
+joints rebuild when their endpoints share a space, or a world-anchored body moves
+spaces. Deleting an endpoint invalidates the joint until it is explicitly rebound;
+it does not silently replace a deleted body with the world.
+
+The adapter retains Box3D's hinge angle/motor convention: frame B relative to A
+about local Z. With B fixed to the world, positive motor speed therefore rotates
+body A negatively about that axis. Limits and live motor edits use the same
+convention as an explicit static body B; exact GodotPhysics solver trajectories
+and motor-direction parity are not claimed.
 
 ## Hinge motor impulse budget
 

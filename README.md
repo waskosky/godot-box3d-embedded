@@ -64,6 +64,12 @@ Downstream `main` periodically promotes a tested integration snapshot. Keep base
 
 The fork covers rigid/static/kinematic bodies, areas, direct queries, character motion, pin/hinge/slider joints, and primitive, convex, trimesh, heightmap, world-boundary, and query-only separation-ray shapes. Focused regressions cover shared resources, terrain and contact geometry, animated platforms, and rigid-body behavior.
 
+The advancing integration candidate also supports one-body world anchors for
+pin, hinge and slider joints, including deferred space attachment and safe
+endpoint teardown. See its [matching native/Web qualification](docs/world-joint-qualification.md)
+and [joint conventions](docs/behavior-differences.md#ignored-joint-parameters).
+These additions are not in the separately linked preview 3 binaries.
+
 Read [behavior differences](docs/behavior-differences.md) before adopting it. Unsupported joints, soft bodies, concave sensor visitors, scaling restrictions, and remaining qualification gates are explicit in the [readiness guide](docs/physics-readiness.md). General installation and native build instructions are in [installation](docs/installation.md) and [building](docs/building.md).
 
 ## License and credit

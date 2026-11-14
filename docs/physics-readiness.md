@@ -43,6 +43,10 @@ The native suite exercises actual Godot bodies and queries, including:
   connected-node teardown and setters after native joint destruction.
 - Quantitative hinge motor impulse budgets across 30/60/120 Hz, time-scale
   changes, rotated axes, live edits and equal/opposite dynamic endpoint response.
+- World-anchored pin/hinge/slider constraints in either NodePath slot, non-origin
+  rotated frames, asymmetric hinge limits, live edits and the world-hinge motor
+  budget. Deferred RID creation, cross-space endpoints, space destruction,
+  reattachment and deletion/rebinding exercise the same endpoint lifecycle.
 
 Run the complete native suite with a matching Godot executable:
 
