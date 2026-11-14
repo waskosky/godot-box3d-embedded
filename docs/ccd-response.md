@@ -37,10 +37,10 @@ expect replay compatibility with uncorrected binaries.
 
 `box3d` and `dependencies.lock` still pin original-maintainer
 `erincatto/box3d` at `be8c731`. `scripts/prepare_box3d.py` verifies the upstream
-`distance.c` and `shape.c` checksums and stages corrected copies in the build directory.
-Both CMake and SCons compile those copies instead of the originals. The submodule
-stays clean, including static-template builds; a dependency/source change
-fails closed until this correction is reviewed. CRLF checkouts are supported.
+`distance.c` and `shape.c` checksums and stages corrected copies in the build
+directory. Both CMake and SCons compile those copies instead of the originals.
+The submodule stays clean, including static-template builds; a dependency/source
+change fails closed until this correction is reviewed. CRLF checkouts are supported.
 
 Normal native, ordinary Web and static Web build commands require no new
 option. Build matching native editor libraries and Web artifacts from the
@@ -57,12 +57,13 @@ Package receipts identify the source overlay as well as the upstream pin.
   It waits for the requested physics step before launching, avoiding the
   startup-rate coverage bug in the earlier diagnostic.
 - `test_project/benchmarks/ccd_response_controls.c`: 774 independent native
-  cases across sizes, speeds, 1/4/8 substeps and hull/mesh/heightfield targets, plus four-worker static,
-  kinematic and dynamic targets, restitution and grazing controls. CMake's
-  `check-ccd-response` target runs them; the normal headless runner includes it.
+  cases across sizes, speeds, 1/4/8 substeps and hull/mesh/heightfield targets,
+  plus four-worker static, kinematic and dynamic targets, restitution and grazing
+  controls. CMake's `check-ccd-response` target runs them; the normal headless
+  runner includes it.
 - The Web smoke scene requires 18 small-projectile response cases on thin boxes
-  and meshes, on floors, walls and ceilings with sphere/box/capsule movers, in addition to its prior
-  physics checks. It does not change the scene's tick rate.
+  and meshes, on floors, walls and ceilings with sphere/box/capsule movers, in
+  addition to its prior physics checks. It does not change the scene's tick rate.
 - The original small standalone `ccd_thin_hull_repro.c` remains available;
   the former GDScript benchmark now delegates to the normal regression.
 
@@ -74,14 +75,46 @@ tests exercise the defect rather than just detecting a loaded backend.
 The local scalar Debug build also passes all 774 controls with UBSan enabled.
 Of the 28 upstream core test groups, 27 pass unchanged. The remaining group
 first asserts the old exact ragdoll trajectory: the corrected single-precision
-run sleeps at step 278 with hash `D32FD9AD`, versus upstream's 277/`5E042B6E`.
-Mesh-drop also changes to `F1B693C4` (same sleep step 197). A separately retained
+run sleeps at step 324 with hash `8CDCDB2A`, versus upstream's 277/`5E042B6E`.
+Mesh-drop also changes to step 188/hash `53CC9371`. A separately retained
 copy of that test, with only old-golden assertions excluded, passes all its
 worker-count and SIMD-width equality checks. No original test or assertion in
 the dependency checkout is modified. This is local repeatability evidence,
 not a claim of an unchanged upstream suite or cross-platform replay identity.
 
-Matching full-suite and browser build receipts are recorded after candidate
-qualification. Do not interpret these bounded checks as arbitrary-scale CCD,
-real-device or production certification. Physical mobile/GPU budgets and the
-previously recorded rendering/background-resume limitations remain open.
+## Matching-build qualification
+
+Runtime candidate `bf68b12767d311587c3781a7bda843c552d3c108` was tested on
+2026-11-14. The final documentation-only follow-up does not change that runtime.
+
+- Native: [the complete CI matrix passed](https://github.com/waskosky/godot-box3d-embedded/actions/runs/43624789084),
+  covering Linux, Windows, universal macOS, minimum Godot 4.3 compatibility,
+  ASan and scalar UBSan runtime checks. The normal suite has 50 tests, including
+  the 144-case CCD regression, and runs the 774 native controls first. Local
+  Godot 4.7 also passes all 50 tests with a freshly built extension.
+- Ordinary Web: [build, Chromium smoke and packaging passed](https://github.com/waskosky/godot-box3d-embedded/actions/runs/43624791769).
+  All 18 required smoke markers pass, including the thin-hull/mesh response
+  contract. The captured final frame was also visually checked.
+- The same ordinary-Web artifacts also pass the full 144-case CCD fixture in
+  local Chromium 148.0.7778.96 and Firefox 150.0.2. Only the fixture's entry point
+  and scene-tree access were adapted for Web export; its physics assertions were
+  unchanged. This ordinary build enforces one physics worker.
+- Static worker-main Web: [matching Debug/Release builds and browser qualification passed](https://github.com/waskosky/godot-box3d-embedded/actions/runs/43625406853).
+  Both targets pass all 18 smoke markers in Chromium and Firefox. The Release
+  workload also passes six cycles per browser with stable cleanup counts and
+  no reported errors. These CI runs use software graphics, not device budgets.
+  The artifact contains matching archives, templates, hashes, and browser receipts.
+- That exact static Release template also passes the full 144-case fixture in
+  local Chromium 148.0.7778.96 and Firefox 150.0.2, requesting eight physics
+  workers. Its SHA-256 is
+  `7c80e56560accec13079f1bd58b952281d7d9557f80bfc1af0f05b5a99c43c16`.
+
+Visual inspection of the static Release frames found complete readable text in
+Chromium, but the Firefox frame still has the previously recorded missing-glyph
+segments despite passing physics/console checks. This is not a rendering fix;
+the [separate capture investigation](web-capture-diagnosis.md) remains relevant.
+
+Do not interpret these bounded checks as arbitrary-scale CCD, real-device or
+production certification. Physical mobile/GPU budgets and the previously
+recorded rendering/background-resume limitations remain open. The published
+preview-4 artifacts have not been replaced; use matching newly built artifacts.
