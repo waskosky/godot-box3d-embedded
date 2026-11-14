@@ -3,6 +3,8 @@
 #include "../misc/type_conversions.hpp"
 
 #include <box3d/collision.h>
+#include <godot_cpp/templates/hash_map.hpp>
+#include <godot_cpp/templates/local_vector.hpp>
 
 Box3DConcavePolygonShapeImpl3D::~Box3DConcavePolygonShapeImpl3D() {
 	if (mesh != nullptr) {
@@ -41,21 +43,30 @@ b3MeshData* Box3DConcavePolygonShapeImpl3D::build_mesh(
 	const int triangle_count = face_count / 3;
 
 	LocalVector<b3Vec3> vertices;
-	vertices.resize(face_count);
-
 	LocalVector<int32_t> indices;
 	indices.resize(face_count);
+	HashMap<Vector3, int32_t> shared_vertices;
 
+	// Native adjacency needs shared vertex IDs; do not weld merely nearby surfaces.
 	for (int i = 0; i < face_count; i++) {
-		vertices[i] = godot_to_b3(p_transform.xform(p_faces[i]));
+		const Vector3 vertex = p_faces[i];
+		const int32_t* existing = shared_vertices.getptr(vertex);
+		if (existing != nullptr) {
+			indices[i] = *existing;
+		} else {
+			const int32_t index = (int32_t)vertices.size();
+			shared_vertices.insert(vertex, index);
+			vertices.push_back(godot_to_b3(p_transform.xform(vertex)));
+			indices[i] = index;
+		}
 	}
 
 	// Box3D meshes use the opposite winding order to Godot's concave shapes, so emit
 	// each triangle reversed (v0, v2, v1) to make trimesh collision register.
 	for (int t = 0; t < triangle_count; t++) {
-		indices[t * 3 + 0] = t * 3 + 0;
-		indices[t * 3 + 1] = t * 3 + 2;
-		indices[t * 3 + 2] = t * 3 + 1;
+		const int32_t second = indices[t * 3 + 1];
+		indices[t * 3 + 1] = indices[t * 3 + 2];
+		indices[t * 3 + 2] = second;
 	}
 
 	b3MeshDef def = {};
@@ -63,11 +74,11 @@ b3MeshData* Box3DConcavePolygonShapeImpl3D::build_mesh(
 	def.indices = indices.ptr();
 	def.materialIndices = nullptr;
 	def.weldTolerance = 0.0f;
-	def.vertexCount = face_count;
+	def.vertexCount = (int32_t)vertices.size();
 	def.triangleCount = triangle_count;
 	def.weldVertices = false;
 	def.useMedianSplit = false;
-	def.identifyEdges = false;
+	def.identifyEdges = true;
 
 	return b3CreateMesh(&def, nullptr, 0);
 }
