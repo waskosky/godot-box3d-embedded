@@ -112,10 +112,22 @@ and boxes can also snag at internal mesh edges.
 
 The ordinary smoke's passing terrain checks do not cover these failure modes.
 Keep collision meshes simple and do not treat preview 3 as dense-terrain
-qualification. A separate newer-engine candidate evaluates the upstream cache
-and ghost-contact fixes with shared mesh adjacency and preserved ray face
-indices; those changes are not in preview 3. Increasing the old fixed cap is
-not the downstream solution being pursued.
+qualification. Preview 4 includes the newer original-maintainer cache and
+ghost-contact fixes with shared mesh adjacency and preserved ray face indices.
+Those changes are not in preview 3; the solution is not an increase to the old
+fixed cap.
+
+## Separate terrain tiles are not one welded mesh
+
+Native edge adjacency is within each mesh, not between separate fixtures.
+Focused capsule/box checks traverse coplanar tile boundaries in both directions
+under floor-, wall- and ceiling-oriented gravity. They retain support, but
+separate edges can still cause a small bump and loss of tangential progress.
+The current probe observes about 3.4 cm maximum height error on split tiles
+versus about 0.5 cm on its continuous-mesh controls. This is bounded traversal,
+not seamless cross-fixture welding. Use one contiguous collision mesh when
+smooth internal adjacency is important; do not expect nearby vertices or
+independent terrain tiles to be welded automatically.
 
 ## Ignored joint parameters
 
@@ -142,6 +154,17 @@ about local Z. With B fixed to the world, positive motor speed therefore rotates
 body A negatively about that axis. Limits and live motor edits use the same
 convention as an explicit static body B; exact GodotPhysics solver trajectories
 and motor-direction parity are not claimed.
+
+An enabled motor is not a universal keep-awake flag. With default native sleep
+thresholds, weak motors or very slow target speeds can go to sleep while the
+motor remains enabled. A supported live edit wakes them, but does not change
+that subsequent sleep policy. For a rotor that must keep running at low speed,
+set `RigidBody3D.can_sleep = false` on that body; keep sleeping enabled on other
+bodies where possible. The opt-in
+`test_project/benchmarks/motor_sleep_probe.gd` compares weak, strong and slow
+motors, with a sleeping-disabled control. Its observations are separate from
+the quantitative impulse-budget regression and do not promise GodotPhysics
+solver or sleep-policy parity.
 
 ## Hinge motor impulse budget
 

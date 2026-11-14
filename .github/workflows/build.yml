@@ -255,7 +255,8 @@ jobs:
 
   release:
     needs: [build, compatibility, sanitizer-build, address-safety, undefined-behavior]
-    if: startsWith(github.ref, 'refs/tags/v')
+    # Embedded previews publish matching native/Web bundles from qualified runs.
+    if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref_name, '-embedded.')
     runs-on: ubuntu-latest
     permissions:
       contents: write

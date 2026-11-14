@@ -133,7 +133,7 @@ def main() -> int:
             }""")
             report.update(page.evaluate("() => window.__box3dPageTiming()"))
             renderer = str(report["graphics"].get("renderer", "")).lower()
-            report["hardware_timing_eligible"] = bool(args.headed and not report["software_gl"] and renderer and not any(x in renderer for x in ("swiftshader", "llvmpipe", "software", "lavapipe")))
+            report["hardware_timing_eligible"] = bool(args.headed and not report["software_gl"] and renderer and not any(x in renderer for x in ("swiftshader", "llvmpipe", "software", "lavapipe", "or similar")))
             page.screenshot(path=str(args.output.with_suffix(".final.png")))
             report["http_ok"] = bool(response and response.ok)
             browser.close()

@@ -92,6 +92,7 @@ def main() -> int:
     loads: list[dict[str, object]] = []
     physics_pass_at: float | None = None
     result_frame_at: float | None = None
+    observation_seconds = 0.0
     try:
         with sync_playwright() as playwright:
             launch_options: dict[str, object] = {"headless": not args.headed}
@@ -127,6 +128,8 @@ def main() -> int:
                 physics_pass_at = None
                 result_frame_at = None
                 started = time.monotonic()
+                if args.headed:
+                    page.bring_to_front()
                 response = page.goto(
                     f"http://127.0.0.1:{port}/index.html",
                     wait_until="domcontentloaded",
@@ -145,12 +148,15 @@ def main() -> int:
                     "required": required_checks(console_lines),
                     "seconds_to_physics_pass": round(physics_pass_at - started, 3) if physics_pass_at is not None else None,
                     "seconds_to_result_frame": round(result_frame_at - started, 3) if result_frame_at is not None else None,
+                    "elapsed_seconds": round(time.monotonic() - started, 3),
                     "ok": passed,
                 })
                 if not passed:
                     break
             if loads[-1]["ok"] and args.observe_seconds:
+                observation_started = time.monotonic()
                 page.wait_for_timeout(args.observe_seconds * 1000)
+                observation_seconds = time.monotonic() - observation_started
 
             if args.screenshot:
                 screenshot = Path(args.screenshot)
@@ -169,7 +175,8 @@ def main() -> int:
         "ok": len(loads) == args.reloads + 1 and all(load["ok"] for load in loads) and not errors,
         "required": required,
         "loads": loads,
-        "post_pass_observation_seconds": args.observe_seconds,
+        "requested_post_pass_observation_seconds": args.observe_seconds,
+        "post_pass_observation_seconds": round(observation_seconds, 3),
         "errors": errors,
         "console_tail": console_lines[-20:],
     }
