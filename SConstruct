@@ -10,6 +10,9 @@ import os
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path("scripts").resolve()))
+from prepare_box3d import prepare
+
 
 LIBRARY_NAME = "godot-box3d"
 TEST_ADDON_DIR = "test_project/addons/godot-box3d"
@@ -160,6 +163,8 @@ if platform_name in ("linux", "android"):
 
 extension_sources = _recursive_sources("src", ".cpp")
 box3d_sources = _recursive_sources("box3d/src", ".c")
+box3d_sources.remove("box3d/src/distance.c")
+corrected_distance = prepare(Path("box3d/src/distance.c"), Path("build/box3d-patched/distance.c"))
 
 if not extension_sources:
     print("ERROR: No extension C++ sources were found under src/.")
@@ -172,6 +177,7 @@ objects = []
 compile_objects = _compile_static_objects if LINK_MODE == "static" else _compile_shared_objects
 objects.extend(compile_objects(extension_env, extension_sources, "src", "extension", variant))
 objects.extend(compile_objects(box3d_env, box3d_sources, "box3d/src", "box3d", variant))
+objects.extend(compile_objects(box3d_env, [str(corrected_distance)], str(corrected_distance.parent), "box3d", variant))
 
 # Match the naming convention used by godot-cpp's official template. Removing
 # .universal keeps the macOS filename architecture-neutral while preserving the

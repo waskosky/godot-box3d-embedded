@@ -45,6 +45,7 @@ def required_checks(lines: list[str]) -> dict[str, bool]:
         "hinge_impulse": "Hinge motor impulse budget: PASS" in lines,
         "mesh_contacts": "Mesh seam/dense contacts: PASS" in lines,
         "world_joints": "World-anchored pin/hinge/slider: PASS" in lines,
+        "ccd_response": "Thin-surface CCD response: PASS" in lines,
         "physics": "RESULT: PASS" in lines,
         "render_submission": "Smoke result frame submitted" in lines,
     }

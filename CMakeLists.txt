@@ -19,9 +19,36 @@ set(BOX3D_UNIT_TESTS OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(box3d)
 
+# Keep the original-maintainer submodule pristine. Both build systems use the
+# same checked source overlay for the CCD -> speculative-contact handoff fix.
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+set(BOX3D_CORRECTED_DISTANCE "${CMAKE_CURRENT_BINARY_DIR}/box3d-patched/distance.c")
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+	"${CMAKE_CURRENT_SOURCE_DIR}/box3d/src/distance.c"
+	"${CMAKE_CURRENT_SOURCE_DIR}/scripts/prepare_box3d.py"
+)
+execute_process(
+	COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/prepare_box3d.py"
+		"${CMAKE_CURRENT_SOURCE_DIR}/box3d/src/distance.c" "${BOX3D_CORRECTED_DISTANCE}"
+	COMMAND_ERROR_IS_FATAL ANY
+)
+get_target_property(BOX3D_CORE_SOURCES box3d SOURCES)
+list(REMOVE_ITEM BOX3D_CORE_SOURCES distance.c)
+set_property(TARGET box3d PROPERTY SOURCES "${BOX3D_CORE_SOURCES}")
+target_sources(box3d PRIVATE "${BOX3D_CORRECTED_DISTANCE}")
+
 # Box3D is a static library embedded in the GDExtension. Keep it relocatable so Debug builds
 # instrumented by sanitizers can still be linked into the shared library on ELF platforms.
 set_target_properties(box3d PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+add_executable(box3d-ccd-response EXCLUDE_FROM_ALL test_project/benchmarks/ccd_response_controls.c)
+target_link_libraries(box3d-ccd-response PRIVATE box3d::box3d)
+set_target_properties(box3d-ccd-response PROPERTIES C_STANDARD 17 C_STANDARD_REQUIRED YES)
+add_custom_target(check-ccd-response
+	COMMAND $<TARGET_FILE:box3d-ccd-response>
+	DEPENDS box3d-ccd-response
+	COMMENT "Checking native CCD response, restitution, grazing and moving targets"
+)
 
 # --- godot-cpp (fetched via ExternalProject_Add) ---
 include(cmake/GodotBox3DExternalGodotCpp.cmake)

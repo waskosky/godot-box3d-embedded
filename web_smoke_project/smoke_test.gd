@@ -583,6 +583,10 @@ func _run_checks() -> void:
     _append_status("World-anchored pin/hinge/slider: %s" % ("PASS" if world_joints_ok else "FAIL"))
     if not world_joints_ok:
         failures.append("World-anchored joint contract failed")
+    var ccd_response_ok: bool = _runtime_contracts.ccd_response_ok
+    _append_status("Thin-surface CCD response: %s" % ("PASS" if ccd_response_ok else "FAIL"))
+    if not ccd_response_ok:
+        failures.append("CCD response crossed a thin surface or lost tangential travel")
     if not mesh_contacts_ok:
         failures.append("Mesh seam/dense contact support failed")
     if not materials_ok or not joints_ok:

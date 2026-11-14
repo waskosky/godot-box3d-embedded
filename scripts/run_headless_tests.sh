@@ -40,6 +40,7 @@ fi
 
 cmake -S "$repo_root" -B "$build_dir"
 cmake --build "$build_dir" --target godot-box3d --parallel "$jobs"
+cmake --build "$build_dir" --target check-ccd-response --parallel "$jobs"
 
 if [[ ! -f "$extension_library" ]]; then
 	printf 'ERROR: Expected extension library was not built: %s\n' "$extension_library" >&2

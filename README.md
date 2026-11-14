@@ -8,12 +8,13 @@ We maintain static embedding into custom Godot Web templates, application execut
 
 **Status: experimental.** Passing regressions establish a development baseline. Device support, startup latency, sustained frame pacing, and memory budgets require qualification for the application using the backend. See [physics readiness](docs/physics-readiness.md) and [release qualification](docs/release-qualification.md).
 
-**Known CCD issue:** a fast sphere can cross a thin box at 30 Hz even with
-continuous collision enabled. This reproduces in standalone Box3D, including
-the older upstream engine pin; static Web embedding is not exempt. See the
-[focused reproduction and limits](docs/edge-qualification.md#thin-hull-ccd-is-an-open-engine-defect).
-Smaller fast spheres also reproduce the native failure at 60/120 Hz; increasing
-the tick rate is not a general fix.
+**CCD source correction:** builds from this branch include a native correction
+for fast rounded shapes crossing thin surfaces after initial CCD impact. CMake
+and SCons apply the same checked source overlay; the original-maintainer Box3D
+dependency stays unchanged. See [the correction and regression scope](docs/ccd-response.md).
+The previously published **preview 4 binaries still contain this defect**,
+including failures at 30/60/120 Hz. Rebuild matching native/Web artifacts to
+use the correction; do not combine an old static template with a new addon.
 
 ## Try the prebuilt Web preview
 

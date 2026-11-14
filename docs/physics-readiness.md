@@ -77,12 +77,12 @@ also explain finite world boundaries and material migration.
 
 ## Remaining acceptance gates
 
-The [extended CCD reproduction](edge-qualification.md#thin-hull-ccd-is-an-open-engine-defect)
-is a confirmed native-engine failure, not a passing regression. It is retained
-as `test_project/benchmarks/ccd_geometry_probe.gd` and a standalone C reproduction.
-The initial 50-test candidate fails this case in CI; the normal suite's 49
-passing checks do not certify it. A native fix and matching native/Web
-qualification are needed before claiming high-speed thin-hull CCD acceptance.
+The [CCD response correction](ccd-response.md) moves the former known-failing
+diagnostic into the normal native suite and adds a required browser response
+check. It fixes the reproduced thin-surface handoff without increasing native
+substeps. Published preview 4 binaries remain uncorrected; source builds and
+their matching native/Web qualification must not be confused with that release.
+This bounded coverage is not a guarantee for arbitrary speed, scale or geometry.
 
 1. Test physical Android and iPhone/Safari devices, including repeated scene
    reloads and background/resume. Desktop WebKit is only a browser sanity check.

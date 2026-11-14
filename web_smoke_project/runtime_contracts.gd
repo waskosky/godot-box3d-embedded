@@ -7,12 +7,80 @@ var joints_ok: bool = true
 var hinge_impulse_ok: bool = false
 var mesh_contacts_ok: bool = false
 var world_joints_ok: bool = false
+var ccd_response_ok: bool = false
 
 
 func _ready() -> void:
 	position.x = 70
 	_world_joint_contract()
+	_ccd_response_contract()
 	_run()
+
+
+func _ccd_response_contract() -> void:
+	# Small, fast rounded shapes expose the post-TOI failure even at 60/120 Hz.
+	# Keep the smoke scene's tick rate unchanged so its other contracts stay valid.
+	var cases: Array[Dictionary] = []
+	for orientation in 3:
+		for kind in 3:
+			var basis: Basis = [Basis(), Basis(Vector3.FORWARD, PI / 2), Basis(Vector3.RIGHT, PI)][orientation]
+			var frame := Transform3D(basis, Vector3(150 + 60 * cases.size(), 100, 0))
+			var wall := StaticBody3D.new()
+			wall.transform = frame
+			wall.collision_layer = 256
+			wall.collision_mask = 256
+			var collision := _box(Vector3(40, 0.025, 40))
+			collision.position.y = -0.0125
+			wall.add_child(collision)
+			add_child(wall)
+			var body := RigidBody3D.new()
+			body.transform = frame * Transform3D(Basis(), Vector3(-1, 2, 0))
+			body.collision_layer = 256
+			body.collision_mask = 256
+			body.continuous_cd = true
+			body.can_sleep = false
+			body.gravity_scale = 0.0
+			body.lock_rotation = true
+			body.linear_damp_mode = RigidBody3D.DAMP_MODE_REPLACE
+			body.linear_damp = 0.0
+			var material := PhysicsMaterial.new()
+			material.friction = 0.0
+			body.physics_material_override = material
+			collision = CollisionShape3D.new()
+			if kind == 0:
+				var sphere := SphereShape3D.new()
+				sphere.radius = 0.01
+				collision.shape = sphere
+			elif kind == 1:
+				var capsule := CapsuleShape3D.new()
+				capsule.radius = 0.01
+				capsule.height = 0.04
+				collision.shape = capsule
+			else:
+				collision = _box(Vector3.ONE * 0.02)
+			body.add_child(collision)
+			add_child(body)
+			cases.append({"body": body, "wall": wall, "frame": frame})
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	for item in cases:
+		item.body.linear_velocity = item.frame.basis * Vector3(30, -300, 0)
+	var ok := true
+	for tick in 8:
+		await get_tree().physics_frame
+		for item in cases:
+			var state := PhysicsServer3D.body_get_direct_state(item.body.get_rid())
+			# The fixtures are children of this translated contract node.
+			var local: Vector3 = (global_transform * item.frame).affine_inverse() * state.transform.origin
+			ok = ok and local.is_finite() and state.linear_velocity.is_finite() and local.y > 0.007
+	for item in cases:
+		var state := PhysicsServer3D.body_get_direct_state(item.body.get_rid())
+		var local: Vector3 = (global_transform * item.frame).affine_inverse() * state.transform.origin
+		var velocity: Vector3 = item.frame.basis.inverse() * state.linear_velocity
+		ok = ok and local.y < 0.03 and local.x > -0.5 and absf(velocity.y) < 1.0 and velocity.x > 20.0
+		item.body.queue_free()
+		item.wall.queue_free()
+	ccd_response_ok = ok
 
 
 func _world_joint_contract() -> void:

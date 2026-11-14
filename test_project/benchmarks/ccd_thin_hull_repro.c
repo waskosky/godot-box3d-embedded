@@ -5,7 +5,8 @@
 #include <stdlib.h>
 #include <math.h>
 
-// Known failure: initial TOI is caught, then the 30 Hz response crosses the plate.
+// Uncorrected upstream fails: initial TOI is caught, then response crosses the plate.
+// Both downstream build systems include the correction; this reproducer must pass.
 int main(int argc, char **argv) {
 	int substeps = argc > 1 ? atoi(argv[1]) : 4;
 	float radius = argc > 2 ? (float)atof(argv[2]) : 0.1f;

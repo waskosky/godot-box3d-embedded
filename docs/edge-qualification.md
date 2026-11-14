@@ -4,6 +4,10 @@ These checks use the unchanged preview-4 runtime `14a4f86` and its matching
 native/ordinary/static artifacts. They extend the recorded scope; they do not
 turn the experimental release into production certification.
 
+**Historical release findings:** the source branch now carries a
+[CCD response correction](ccd-response.md). The preview-4 artifacts described
+below have not been replaced and remain affected.
+
 ## Separate terrain tiles and motor sleeping
 
 The normal native suite adds one focused tile regression (49 tests total).
@@ -114,5 +118,6 @@ Real-GPU budgets, mobile and background/resume still require other evidence.
 
 Local receipts, source/artifact hashes and frames are retained under
 `build/validation/` in the qualification worktrees. Preview-4 compiler manifests
-and published binary/template bytes are unchanged. Prioritize the native CCD
-response investigation before further performance tuning or production claims.
+and published binary/template bytes are unchanged. The subsequent
+[CCD response work](ccd-response.md) records the fix and its own validation,
+separately from this release's evidence.
