@@ -14,6 +14,24 @@ every fresh backend, physics and frame marker; engine/browser errors still fail.
 Before this correction, a reproduced reload passed every check but failed solely
 because Playwright's `response.ok` excludes 304.
 
+## Functional capture qualification
+
+Clean fixture source `c1ebc5959b30ba2275136dac7fdc8ad9353dfa0e` passes all
+15 physics checks plus the new submission marker in both Chromium and Firefox
+with the qualified terrain Release and Debug static templates. The four frames
+were inspected: two have complete text and two retain missing glyphs. The engine
+code is unchanged from their clean build receipt `e82d039`; template hashes are
+listed in the [terrain qualification](box3d-terrain-evaluation.md).
+
+The final unbatched ordinary fixture also passes both browsers with an additional
+load, including Firefox's 200/304 sequence. Every load records its own checks;
+no physics assertions or movement windows were loosened for this change.
+
+WebKit 26.4 now launches locally, but its ordinary physics run fails during
+Godot GLES3 scene/canvas vertex-shader compilation, before physics acceptance.
+That is a failed WebKit qualification, not a passing backend startup and not
+evidence of a Box3D solver defect.
+
 ## Bounded investigation, November 14
 
 Local ordinary Release Web checks used official Godot 4.7 and Playwright 1.60.0.
