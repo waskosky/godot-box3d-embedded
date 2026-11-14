@@ -101,6 +101,22 @@ plane. It is not an infinite solid half-space: its edges and underside are real
 collision surfaces. The large-surface motion fix improves contact refinement
 inside this representation; it does not change that geometric limitation.
 
+## Mesh contact limits in preview 3
+
+The preview 3 binaries retain Box3D `f36d061`. Its native contact cache considers
+at most 512 mesh/heightfield triangles overlapping one convex body's bounds.
+This is not a limit on the total triangles in a scene: a finely tessellated
+surface can reach it under a single small body. A focused dense-mesh test
+reproduces a sphere falling through after the capacity warning. Rigid capsules
+and boxes can also snag at internal mesh edges.
+
+The ordinary smoke's passing terrain checks do not cover these failure modes.
+Keep collision meshes simple and do not treat preview 3 as dense-terrain
+qualification. A separate newer-engine candidate evaluates the upstream cache
+and ghost-contact fixes with shared mesh adjacency and preserved ray face
+indices; those changes are not in preview 3. Increasing the old fixed cap is
+not the downstream solution being pursued.
+
 ## Ignored joint parameters
 
 Godot's joint API exposes parameters Box3D has no equivalent for, including `HingeJoint3D`'s `LIMIT_RELAXATION` and `LIMIT_SOFTNESS`, `PinJoint3D`'s `IMPULSE_CLAMP`, and most of `SliderJoint3D`'s per-axis tuning (Box3D's prismatic joint is a pure 1-DOF slider).
