@@ -163,7 +163,7 @@ if platform_name in ("linux", "android"):
 
 extension_sources = _recursive_sources("src", ".cpp")
 box3d_sources = _recursive_sources("box3d/src", ".c")
-box3d_sources.remove("box3d/src/distance.c")
+box3d_sources.remove(str(Path("box3d/src/distance.c")))
 corrected_distance = prepare(Path("box3d/src/distance.c"), Path("build/box3d-patched/distance.c"))
 
 if not extension_sources:

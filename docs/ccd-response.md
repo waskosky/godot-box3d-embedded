@@ -66,6 +66,16 @@ control passes 288/288. The new Godot regression also fails against the
 unchanged preview-4 library. These negative controls demonstrate that the
 tests exercise the defect rather than just detecting a loaded backend.
 
+The local scalar Debug build also passes all 288 controls with UBSan enabled.
+Of the 28 upstream core test groups, 27 pass unchanged. The remaining group
+first asserts the old exact ragdoll trajectory: the corrected single-precision
+run sleeps at step 278 with hash `D32FD9AD`, versus upstream's 277/`5E042B6E`.
+Mesh-drop also changes to `F1B693C4` (same sleep step 197). A separately retained
+copy of that test, with only old-golden assertions excluded, passes all its
+worker-count and SIMD-width equality checks. No original test or assertion in
+the dependency checkout is modified. This is local repeatability evidence,
+not a claim of an unchanged upstream suite or cross-platform replay identity.
+
 Matching full-suite and browser build receipts are recorded after candidate
 qualification. Do not interpret these bounded checks as arbitrary-scale CCD,
 real-device or production certification. Physical mobile/GPU budgets and the
