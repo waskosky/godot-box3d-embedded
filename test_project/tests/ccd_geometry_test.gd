@@ -70,13 +70,23 @@ func _check_impacts(rate: int) -> void:
 				cases.append({"body": body, "frame": frame, "mesh": mesh, "rotated": rotated, "box": box})
 	await physics_frame
 	await physics_frame
+	# Engine rate changes can take several frames to reach the space. Launch
+	# only after observing the requested step, not at the previous tick rate.
+	var applied_step: float = 0.0
+	for attempt in range(12):
+		await physics_frame
+		applied_step = PhysicsServer3D.body_get_direct_state(cases[0].body.get_rid()).step
+		if absf(applied_step - 1.0 / rate) < 0.000001:
+			break
+	_check(absf(applied_step - 1.0 / rate) < 0.000001, "requested CCD tick rate reaches the physics space")
+	print("CCD requested rate=", rate, " applied step=", applied_step)
 	for item: Dictionary in cases:
 		item.body.linear_velocity = item.frame.basis * Vector3(60, -600, 0)
 	for tick: int in range(8):
 		await physics_frame
 		for item: Dictionary in cases:
 			var local: Vector3 = item.frame.affine_inverse() * item.body.position
-			_check(local.is_finite() and item.body.linear_velocity.is_finite() and local.y > -0.03, "CCD does not cross the thin target surface")
+			_check(local.is_finite() and item.body.linear_velocity.is_finite() and local.y > -0.03, "CCD target crossing: rate=%s mesh=%s rotated=%s box=%s tick=%s local=%s velocity=%s" % [rate, item.mesh, item.rotated, item.box, tick, local, item.body.linear_velocity])
 	for item: Dictionary in cases:
 		var local: Vector3 = item.frame.affine_inverse() * item.body.position
 		var velocity: Vector3 = item.frame.basis.inverse() * item.body.linear_velocity
