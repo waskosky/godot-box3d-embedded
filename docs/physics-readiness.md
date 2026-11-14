@@ -7,6 +7,10 @@ upstream pull requests remain based directly on upstream `main`.
 
 The [Web preview qualification](web-preview.md) records the current static Debug/Release CI results and the separate local browser workload comparison, including its failed Firefox deadlines and unqualified hardware/device budgets.
 
+The [capture investigation](web-capture-diagnosis.md) separates physics PASS,
+render submission, cached-navigation handling and the still-unresolved glyph
+artifacts. A successful console check is not a visual acceptance result.
+
 ## Behavioral coverage
 
 The native suite exercises actual Godot bodies and queries, including:
