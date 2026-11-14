@@ -12,6 +12,9 @@ coplanar mesh fixtures and continuous-mesh controls, on floors, walls and
 ceilings. All pass with the release's unmodified macOS CI library. Equivalent
 Node-entry exports, with unchanged physics setup and assertions, also pass in
 Chromium and Firefox using both matching Release Web profiles.
+The focused exports request one physics worker; the ordinary profile also
+enforces one. This does not change the separately recorded eight-worker static
+smoke/workload receipt for the release.
 
 Split tiles show up to about 3.4 cm height error and slightly less progress;
 continuous-mesh controls show about 0.5 cm. Adjacency is not welded between
@@ -55,6 +58,11 @@ upgrade did not introduce this case. The same small C reproduction passes at
 bounded controls, not a universal fix or a reason to silently double the
 adapter's simulation work. The adapter's default remains four substeps.
 
+This is not exclusively a 30 Hz problem. A bounded native C parameter probe
+also puts a radius-0.01 sphere at requested normal speed 300 m/s fully below
+the plate at 60 and 120 Hz (final center about `-0.0353` and `-0.0474`). Passing
+the larger sphere's 60/120 Hz controls is not general high-speed CCD acceptance.
+
 Run the deliberately failing Godot reproduction with:
 
 ```sh
@@ -68,10 +76,12 @@ and compile the file against it, for example after the normal CMake build:
 cc -std=c17 -I box3d/include test_project/benchmarks/ccd_thin_hull_repro.c \
   build/box3d/src/libbox3d.a -lm -lpthread -o build/ccd-thin-hull
 build/ccd-thin-hull
+build/ccd-thin-hull 4 0.01 300
 ```
 
 Default four-substep execution returns failure for this known case. Passing
-`8` selects the comparison, not a production qualification. Keep the assertions
+`8` selects the original larger-sphere comparison; optional further arguments
+select radius and requested normal speed. None is a production qualification. Keep the assertions
 intact and promote the reproduction to the normal regression suite when a
 native fix exists. Do not claim that the green normal suite resolves this bug.
 

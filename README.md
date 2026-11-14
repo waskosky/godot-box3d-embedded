@@ -12,6 +12,8 @@ We maintain static embedding into custom Godot Web templates, application execut
 continuous collision enabled. This reproduces in standalone Box3D, including
 the older upstream engine pin; static Web embedding is not exempt. See the
 [focused reproduction and limits](docs/edge-qualification.md#thin-hull-ccd-is-an-open-engine-defect).
+Smaller fast spheres also reproduce the native failure at 60/120 Hz; increasing
+the tick rate is not a general fix.
 
 ## Try the prebuilt Web preview
 

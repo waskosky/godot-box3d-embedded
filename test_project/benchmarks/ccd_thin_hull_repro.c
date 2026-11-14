@@ -3,11 +3,14 @@
 #include <box3d/math_functions.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 // Known failure: initial TOI is caught, then the 30 Hz response crosses the plate.
 int main(int argc, char **argv) {
 	int substeps = argc > 1 ? atoi(argv[1]) : 4;
-	if (substeps < 1) {
+	float radius = argc > 2 ? (float)atof(argv[2]) : 0.1f;
+	float speed = argc > 3 ? (float)atof(argv[3]) : 600.0f;
+	if (substeps < 1 || !isfinite(radius) || !isfinite(speed) || radius <= 0 || speed <= 0) {
 		return 2;
 	}
 	int failures = 0;
@@ -32,17 +35,17 @@ int main(int argc, char **argv) {
 		body_def.isBullet = true;
 		body_def.linearDamping = 0;
 		b3BodyId body = b3CreateBody(world, &body_def);
-		b3Sphere sphere = {.center = {0, 0, 0}, .radius = 0.1f};
+		b3Sphere sphere = {.center = {0, 0, 0}, .radius = radius};
 		b3CreateSphereShape(body, &shape_def, &sphere);
 		float dt = 1.0f / rate;
 		b3World_Step(world, dt, substeps);
 		b3World_Step(world, dt, substeps);
-		b3Body_SetLinearVelocity(body, (b3Vec3){60, -600, 0});
+		b3Body_SetLinearVelocity(body, (b3Vec3){0.1f * speed, -speed, 0});
 		for (int tick = 0; tick < 8; ++tick) {
 			b3World_Step(world, dt, substeps);
 			b3Pos position = b3Body_GetPosition(body);
 			b3Vec3 velocity = b3Body_GetLinearVelocity(body);
-			printf("rate=%d substeps=%d tick=%d x=%.8f y=%.8f vx=%.8f vy=%.8f\n", rate, substeps, tick,
+			printf("rate=%d substeps=%d radius=%.4f requested_normal_speed=%.1f tick=%d x=%.8f y=%.8f vx=%.8f vy=%.8f\n", rate, substeps, (double)radius, (double)speed, tick,
 					(double)position.x - 50, (double)position.y - 40, (double)velocity.x, (double)velocity.y);
 			failures += position.y < 39.97;
 		}
