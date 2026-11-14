@@ -43,6 +43,19 @@ Logs are under `build/validation/` and `build/native-validation/` locally.
 
 The Web fixture adds one dense-support/seam check inside the existing movement
 window; it does not extend that window or relax existing physics assertions.
-Ordinary Web browser, full cross-platform and matching static Debug/Release
-qualification are pending. Keep this candidate separate until those checks
-complete, and retain the ordinary preview/device/visual/performance limitations.
+An ordinary Release Web export of clean code source `4643510` passes all 15
+checks in local headless Chromium and Firefox, with no captured errors and a
+two-second post-PASS observation. The local harness uses Playwright 1.60.0;
+CI retains its own pinned tools. Observed time to physics PASS is 17.449 seconds
+in Chromium and 40.780 seconds in Firefox on this contended host, not a startup
+or hardware performance qualification.
+
+The export uses the CI-built Godot 4.7 dynamic-link template, SHA-256
+`3f0ee7c6a4e3813b4ab266a1eead55ed5dcb91b84c2f5736b6dc05f69ed5d08d`.
+Its candidate side module is
+`0afa4735e145aa8b062b29a3853e19e48213cc0db4eb826b2a5ec7a07f19e713`.
+The export manifest retains fixture and runtime hashes. Later branch merges
+and README changes only carry preview 3 documentation; they do not change
+the tested adapter or fixture. Full cross-platform/sanitizer and matching
+static Debug/Release qualification remain pending. Keep this candidate separate
+until those checks complete, and retain the device/visual/performance limits.
