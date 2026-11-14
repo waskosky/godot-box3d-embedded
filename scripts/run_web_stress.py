@@ -97,11 +97,11 @@ def main() -> int:
             if args.warmup:
                 warmup_started = time.monotonic()
                 page.goto(f"http://127.0.0.1:{server.server_port}/index.html", wait_until="domcontentloaded", timeout=int(args.timeout * 1000))
-                while "RESULT: PASS" not in lines and not errors and time.monotonic() - warmup_started < args.timeout:
+                while "Smoke result frame submitted" not in lines and "RESULT: FAIL" not in lines and not errors and time.monotonic() - warmup_started < args.timeout:
                     page.wait_for_timeout(100)
                 if not all(required_checks(lines).values()) or errors:
                     raise RuntimeError("Cache warm-up did not pass the unchanged physics smoke")
-                report["warmup_seconds_to_physics_pass"] = round(time.monotonic() - warmup_started, 3)
+                report["warmup_seconds_to_result_frame"] = round(time.monotonic() - warmup_started, 3)
                 lines.clear()
             started = time.monotonic()
             response = page.goto(f"http://127.0.0.1:{server.server_port}/index.html?box3d_stress={args.profile}", wait_until="domcontentloaded", timeout=int(args.timeout * 1000))

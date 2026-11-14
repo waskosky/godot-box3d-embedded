@@ -25,7 +25,7 @@ python3 scripts/run_web_stress.py --dir build/web-smoke --headed --profile stres
   --output build/web-stress/stress.json
 ```
 
-For a cache-warm comparison, add `--warmup`. The runner first requires all ordinary smoke checks to pass in the same browser context, then opens the unchanged workload. Without that flag, each run uses a fresh browser context; this does not flush the operating system's disk cache.
+For a cache-warm comparison, add `--warmup`. The runner first requires all ordinary smoke checks, including the submitted result frame, to pass in the same browser context, then opens the unchanged workload. `warmup_seconds_to_result_frame` includes that fence, not just console physics PASS. Without that flag, each run uses a fresh browser context; this does not flush the operating system's disk cache.
 
 Export equivalent candidates with `scripts/export_web_smoke.py --profile static|extension --template /path/to/template.zip --output /new/export/directory`. Its optional `--workers N` changes only the copied project's requested Box3D worker count. The ordinary extension clamps that request to one worker. Compare static hosts with one worker first to distinguish worker-main execution from additional physics workers, then measure the intended worker setting. Export manifests retain the template/application hashes and unchanged fixture hashes.
 
