@@ -5,7 +5,9 @@ This isolated branch evaluates original-maintainer Box3D commit
 [mesh ghost-contact work](https://github.com/erincatto/box3d/pull/212) and its
 follow-up fixes. The dependency URL remains `https://github.com/erincatto/box3d.git`.
 It starts from downstream `c91a27b`; preview 3 retains its tested `f36d061` pin.
-This is not a new release or qualified static host.
+The candidate is functionally qualified for the downstream integration feed as
+described below. Preview 3 and the reviewed `main` baseline remain unchanged;
+this is not a new release or hardware/device certification.
 
 ## Focused integration
 
@@ -56,6 +58,56 @@ Its candidate side module is
 `0afa4735e145aa8b062b29a3853e19e48213cc0db4eb826b2a5ec7a07f19e713`.
 The export manifest retains fixture and runtime hashes. Later branch merges
 and README changes only carry preview 3 documentation; they do not change
-the tested adapter or fixture. Full cross-platform/sanitizer and matching
-static Debug/Release qualification remain pending. Keep this candidate separate
-until those checks complete, and retain the device/visual/performance limits.
+the tested adapter or fixture.
+
+## Matching CI qualification
+
+Clean source `e82d039a7a2867dbef7e992e55d8f03f57b92ac8` passes:
+
+- [Native qualification](https://github.com/waskosky/godot-box3d-embedded/actions/runs/43546685831):
+  all 47 tests on Linux, Windows and universal macOS, minimum-Godot compatibility,
+  and the existing address/undefined-behavior sanitizer build/runtime checks.
+- [Ordinary Web](https://github.com/waskosky/godot-box3d-embedded/actions/runs/43546685889):
+  extension, matching dynamic-link templates, browser smoke and packaging.
+- [Static worker-main Web](https://github.com/waskosky/godot-box3d-embedded/actions/runs/43546680424):
+  newly linked Release and Debug templates pass all 15 checks in both Chromium
+  and Firefox. Both Release browsers complete six construction/movement/cleanup
+  cycles, with stable post-warm-up node/resource counts and no captured errors.
+
+Static template SHA-256 values are
+`7ca3ac065267b106188e5f5e9423d00382e7701816752c31e1c4497f5f32d2b7`
+(Release) and
+`b23382877ddaafefa65485d5ecbedd5538eee87d23e853756b481bfa26e98806`
+(Debug). The downloaded static bundle matches its published checksum. Reports,
+build receipts and inspected frames are retained together in the run artifact.
+Two smoke frames have incomplete glyphs; the other two show the completed text.
+Functional passing results do not establish clean rendered-frame acceptance.
+These runs use software graphics, not hardware timing or total-memory budgets.
+
+## Construction tradeoff
+
+The existing heightmap construction diagnostic was repeated for three cycles on
+macOS x86-64 / official Godot 4.7 at a 257-by-257 grid (131,072 triangles per
+owner, one identity and one transformed owner). Median times in milliseconds:
+
+| Operation | Preview 3 binary | Candidate |
+| --- | ---: | ---: |
+| Resource construction | 164.089 | 212.791 |
+| Identity owner | 80.413 | 108.303 |
+| Transformed owner | 160.707 | 224.759 |
+| Shared resource update | 121.913 | 211.533 |
+
+Both versions pass placement and cleanup checks. These are contended-host
+diagnostics, not a construction or frame-time budget. A separate three-cycle
+native-only check with identical indexed geometry measures median mesh creation
+at 35.023 ms without edge identification and 51.462 ms with it. Mesh storage
+increases from 4,724,824 to 5,462,624 bytes. This isolates a real cost of native
+adjacency; it does not attribute all adapter cost to that step. Exact-vertex
+deduplication, triangle mapping where needed, and transformed copies also cost
+time. No per-frame rebuild or speculative alternative terrain representation is
+introduced. Build large terrain before gameplay and avoid needless live edits.
+
+The integration choice prioritizes reproduced support/edge correctness while
+keeping this setup tradeoff explicit. Real-GPU visual acceptance, physical
+Android/iPhone, WebKit, background/resume and scene-specific sustained budgets
+remain open gates before an application changes its immutable deployment pin.

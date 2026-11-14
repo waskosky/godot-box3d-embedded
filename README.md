@@ -10,10 +10,11 @@ We maintain static embedding into custom Godot Web templates, application execut
 
 ## Try the prebuilt Web preview
 
-This branch is a [newer-engine mesh/terrain experiment](docs/box3d-terrain-evaluation.md),
-not the released preview. It evaluates the dense-contact and internal-edge fixes;
-matching static qualification is still required. The prebuilt artifacts below
-retain preview 3's separate, older dependency pin and documented limits.
+The integration feed includes the [qualified newer-engine mesh/terrain candidate](docs/box3d-terrain-evaluation.md),
+not a new released preview. Native/sanitizer, ordinary Web, and matching static
+Debug/Release browser checks pass. Large terrain construction costs more; device,
+visual and performance acceptance remain separate gates. The prebuilt artifacts
+below retain preview 3's older dependency pin and documented limits.
 
 Use **Godot 4.7** with [Web preview 3](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.3). Install its [native editor addon](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.3/godot-box3d-embedded-native-editor.zip) by copying `addons/godot-box3d/` into your project, then select **Box3D Physics** and the Compatibility renderer.
 
