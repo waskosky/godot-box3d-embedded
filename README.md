@@ -10,19 +10,21 @@ We maintain static embedding into custom Godot Web templates, application execut
 
 ## Try the prebuilt Web preview
 
-Use **Godot 4.7** with [Web preview 2](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.2). Install its [native editor addon](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.2/godot-box3d-embedded-native-editor.zip) by copying `addons/godot-box3d/` into your project, then select **Box3D Physics** and the Compatibility renderer.
+Use **Godot 4.7** with [Web preview 3](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.3). Install its [native editor addon](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.3/godot-box3d-embedded-native-editor.zip) by copying `addons/godot-box3d/` into your project, then select **Box3D Physics** and the Compatibility renderer.
 
-For worker-main execution, download the [static Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.2/godot-box3d-embedded-static-web.zip) and follow [static embedding](docs/static-embedding.md#use-the-prebuilt-preview) to select its Debug/Release templates. For an ordinary extension export, use the [ordinary Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.2/godot-box3d-web-release.zip) and [Web quick start](WEB_QUICKSTART.md). Keep the files from the same release together and verify the accompanying checksums.
+For worker-main execution, download the [static Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.3/godot-box3d-embedded-static-web.zip) and follow [static embedding](docs/static-embedding.md#use-the-prebuilt-preview) to select its Debug/Release templates. For an ordinary extension export, use the [ordinary Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.3/godot-box3d-web-release.zip) and [Web quick start](WEB_QUICKSTART.md). Keep the files from the same release together and verify the accompanying checksums.
 
-Preview 2 includes the large-surface motion and shape-cast query fixes. Its native libraries and Web templates all use qualified source `47cc6a0`; see [Web preview qualification](docs/web-preview.md) for the exact artifacts and validation limits. Later documentation and regression cleanups do not change that release's binary identity.
+Preview 3 includes live collision-filter edits, live material updates/Godot-style mixing, joint setup/wake-up fixes and corrected hinge motor impulse units, as well as preview 2's motion-query fixes. Its native libraries and Web templates use qualified source `c91a27b`; see [Web preview qualification](docs/web-preview.md) for the exact artifacts and validation limits. Release documentation identifies its revision separately from those frozen binaries.
 
 The release includes [qualification evidence](docs/web-preview.md): bounded physics and cleanup pass in Chromium and Firefox on Linux software GL. Local Firefox timeouts, software-rendered text artifacts, hardware performance, WebKit and physical mobile acceptance remain explicit limits.
 
-The advancing branch adds live material updates/Godot-style material mixing,
-staged hinge/slider setup fixes, scaling diagnostics and AddressSanitizer runtime
-checks. These do not change preview 2's frozen binaries. In particular, revisit
-material tuning when moving from the preview's older combine rules; see
-[behavior differences](docs/behavior-differences.md#physics-materials).
+When upgrading from preview 2, revisit [material tuning](docs/behavior-differences.md#physics-materials)
+and [hinge motor limits](docs/behavior-differences.md#hinge-motor-impulse-budget).
+An unchanged motor cap now permits 60 times the previous maximum torque at
+60 Hz and time scale 1. To preserve a previous torque setting, use
+`max_impulse = desired_torque * physics_step_seconds`. Scaling remains unsupported;
+the new warnings do not add scaling support. Preview 3 retains the same pinned
+Box3D version; newer terrain-engine experiments are not part of its binaries.
 
 ## Choose a Web build
 

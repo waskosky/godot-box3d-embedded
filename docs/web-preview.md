@@ -4,14 +4,61 @@ title: Web preview qualification
 
 # Web preview qualification
 
-Current qualified physics snapshot: `47cc6a0e50a70411fbae4373cd39444ecaf61435`.
+Current functionally qualified physics snapshot: `c91a27b86820990233f7a73f2297d8a4f17ac1b5`.
 Download the matching native editor addon, static bundle or ordinary Web package
-from [Web preview 2](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.2).
-The [static browser results](https://github.com/waskosky/godot-box3d-embedded/actions/runs/41267508528)
-and [ordinary Web pipeline](https://github.com/waskosky/godot-box3d-embedded/actions/runs/41267506200)
-retain the original qualification. Preview 1 predates the large-surface fix.
+from [Web preview 3](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.3).
+This is an experimental development milestone, not production, rendered-frame,
+hardware performance or physical-device certification. Earlier releases and
+their immutable evidence are retained below for comparison and rollback.
 Documentation and regression-only follow-ups do not change the tested physics
 source or replace its artifact identity. Ordinary Web CI does not qualify static embedding.
+
+## Web preview 3 (2026-11-14)
+
+The runtime source `c91a27b` combines live collision layer/mask refiltering,
+live material updates and Godot-style mixing, staged joint setup and wake-up
+fixes, corrected hinge impulse units, scaling warnings and ASan runtime CI.
+It retains the original-maintainer Box3D pin `f36d061`; the newer mesh/terrain
+dependency experiment is separate and is not included in this release.
+
+The [native pipeline](https://github.com/waskosky/godot-box3d-embedded/actions/runs/43416087425)
+passes all 46 tests on Linux x86-64, Windows x86-64 and universal macOS, plus
+Godot 4.3 compatibility, Linux scalar UBSan runtime, macOS ASan runtime and the
+separate ASan/UBSan compile/link check. The
+[ordinary Web pipeline](https://github.com/waskosky/godot-box3d-embedded/actions/runs/43416087703)
+passes its Chromium smoke and complete package checks.
+
+The [matching static workflow](https://github.com/waskosky/godot-box3d-embedded/actions/runs/43544498126)
+builds clean source `c91a27b`, then passes all 14 smoke checks in Release and
+Debug in both Chromium and Firefox, with no captured errors. Both Release
+workloads finish all six physics/cleanup cycles with stable post-cleanup node
+and resource counts. These are Linux software-GL observations, not hardware
+timing or whole-memory leak qualifications. The template SHA-256 values are:
+
+- Release: `b1f29f03c13c90020e22a8d340b780b9107bf31de3f27d20215dcafe2b1b1639`
+- Debug: `8c8b7d2d0358d16b8a496c5d251c629d91421de54dd2be49ea1c81efcf5c6aee`
+
+All four smoke captures were inspected. Release Chromium shows readable final
+PASS text and scene geometry. Release Firefox and Debug Chromium retain missing
+glyphs, and Debug Firefox shows the initial overlay despite passing console
+results. Their cause is unconfirmed; the captures are not clean rendered-frame
+acceptance. Real-GPU browsers, WebKit, physical Android/iPhone, cold/warm startup,
+sustained pacing, memory growth and background/resume remain open gates.
+
+When moving from preview 2, revisit [material tuning](behavior-differences.md#physics-materials)
+and [hinge motor limits](behavior-differences.md#hinge-motor-impulse-budget).
+An unchanged motor impulse cap permits 60 times the previous maximum torque at
+60 Hz and time scale 1. Preserve desired torque with
+`max_impulse = desired_torque * actual_physics_step_seconds`.
+
+The release retains original build manifests and unchanged runtime hashes.
+`QUALIFICATION.json`, the qualification ZIP and `SHA256SUMS` identify the
+matching artifacts and evidence. Refreshed support documentation is identified
+separately by `RELEASE_DOCUMENTATION.json`; its revision does not replace the
+runtime source recorded in the original manifests. ASan instruments the adapter
+and Box3D, not the official engine or cached godot-cpp archive, and does not
+establish native leak detection. Follow [release qualification](release-qualification.md)
+before changing an application's coordinated immutable dependency pins.
 
 ## Hinge motor units candidate (2026-11-09)
 
@@ -48,12 +95,12 @@ The previous `75ee90b` candidate's
 but that does not qualify the new motor mapping. The new
 [static workflow](https://github.com/waskosky/godot-box3d-embedded/actions/runs/42671462450)
 and [ordinary Web workflow](https://github.com/waskosky/godot-box3d-embedded/actions/runs/42671461394)
-reported GitHub internal server errors before their initial jobs could start;
-one retry of each has been requested. The
+initially reported GitHub internal server errors before their jobs could start.
+The November 11 retries of both completed successfully. The
 [native pipeline](https://github.com/waskosky/godot-box3d-embedded/actions/runs/42671461380)
-and upstream CI are also separate acceptance receipts. At this checkpoint,
-downstream `main` and preview 2 remain unchanged; no new static-host qualification
-or release promotion is claimed.
+also completed successfully, including all 46 tests in each runtime job.
+Upstream PR CI remains a separate receipt. These candidate results were later
+superseded by preview 3's matching live-filter snapshot above.
 
 ## Advancing readiness candidate (2026-11-09)
 
