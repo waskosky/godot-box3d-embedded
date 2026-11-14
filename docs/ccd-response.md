@@ -16,6 +16,11 @@ The next manifold can then select the other side of the surface.
 
 The correction uses `radiusA + radiusB + linearSlop` for **time of impact**.
 Its root-finding tolerance is only a quarter of that positive surface gap.
+Solid triangle sweeps also include `B3_MESH_REST_OFFSET` in the triangle proxy
+radius, matching the offset subtracted by mesh/heightfield manifolds. Without
+that term, a geometrically positive gap can still be zero or negative in
+solver space; the first candidate fixed thin boxes but the mesh regression
+correctly remained red. Sensor sweeps do not receive the solid rest offset.
 The next step consequently starts separated and uses the existing hard
 speculative constraint before position integration. The gap is consumed by
 that solve; it is not a persistent collision margin. Friction, restitution,
@@ -32,8 +37,8 @@ expect replay compatibility with uncorrected binaries.
 
 `box3d` and `dependencies.lock` still pin original-maintainer
 `erincatto/box3d` at `be8c731`. `scripts/prepare_box3d.py` verifies the upstream
-`distance.c` checksum and stages a corrected copy in the build directory.
-Both CMake and SCons compile that copy instead of the original. The submodule
+`distance.c` and `shape.c` checksums and stages corrected copies in the build directory.
+Both CMake and SCons compile those copies instead of the originals. The submodule
 stays clean, including static-template builds; a dependency/source change
 fails closed until this correction is reviewed. CRLF checkouts are supported.
 
@@ -51,22 +56,22 @@ Package receipts identify the source overlay as well as the upstream pin.
   support-side containment, stopping response and preserved tangential travel.
   It waits for the requested physics step before launching, avoiding the
   startup-rate coverage bug in the earlier diagnostic.
-- `test_project/benchmarks/ccd_response_controls.c`: 288 independent native
-  cases across sizes, speeds and 1/4/8 substeps, plus four-worker static,
+- `test_project/benchmarks/ccd_response_controls.c`: 774 independent native
+  cases across sizes, speeds, 1/4/8 substeps and hull/mesh/heightfield targets, plus four-worker static,
   kinematic and dynamic targets, restitution and grazing controls. CMake's
   `check-ccd-response` target runs them; the normal headless runner includes it.
-- The Web smoke scene requires a small-projectile response check on floors,
-  walls and ceilings with sphere/box/capsule movers, in addition to its prior
+- The Web smoke scene requires 18 small-projectile response cases on thin boxes
+  and meshes, on floors, walls and ceilings with sphere/box/capsule movers, in addition to its prior
   physics checks. It does not change the scene's tick rate.
 - The original small standalone `ccd_thin_hull_repro.c` remains available;
   the former GDScript benchmark now delegates to the normal regression.
 
-The uncorrected native control passes only 102/288 cases; the corrected native
-control passes 288/288. The new Godot regression also fails against the
+The uncorrected native control passes only 264/774 cases; the corrected native
+control passes 774/774. The new Godot regression also fails against the
 unchanged preview-4 library. These negative controls demonstrate that the
 tests exercise the defect rather than just detecting a loaded backend.
 
-The local scalar Debug build also passes all 288 controls with UBSan enabled.
+The local scalar Debug build also passes all 774 controls with UBSan enabled.
 Of the 28 upstream core test groups, 27 pass unchanged. The remaining group
 first asserts the old exact ragdoll trajectory: the corrected single-precision
 run sleeps at step 278 with hash `D32FD9AD`, versus upstream's 277/`5E042B6E`.

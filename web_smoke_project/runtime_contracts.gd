@@ -21,7 +21,8 @@ func _ccd_response_contract() -> void:
 	# Small, fast rounded shapes expose the post-TOI failure even at 60/120 Hz.
 	# Keep the smoke scene's tick rate unchanged so its other contracts stay valid.
 	var cases: Array[Dictionary] = []
-	for orientation in 3:
+	for surface in 6:
+		var orientation: int = surface % 3
 		for kind in 3:
 			var basis: Basis = [Basis(), Basis(Vector3.FORWARD, PI / 2), Basis(Vector3.RIGHT, PI)][orientation]
 			var frame := Transform3D(basis, Vector3(150 + 60 * cases.size(), 100, 0))
@@ -29,8 +30,15 @@ func _ccd_response_contract() -> void:
 			wall.transform = frame
 			wall.collision_layer = 256
 			wall.collision_mask = 256
-			var collision := _box(Vector3(40, 0.025, 40))
-			collision.position.y = -0.0125
+			var collision: CollisionShape3D
+			if surface >= 3:
+				collision = CollisionShape3D.new()
+				var mesh := ConcavePolygonShape3D.new()
+				mesh.set_faces(PackedVector3Array([Vector3(-20, 0, -20), Vector3(20, 0, -20), Vector3(-20, 0, 20), Vector3(20, 0, -20), Vector3(20, 0, 20), Vector3(-20, 0, 20)]))
+				collision.shape = mesh
+			else:
+				collision = _box(Vector3(40, 0.025, 40))
+				collision.position.y = -0.0125
 			wall.add_child(collision)
 			add_child(wall)
 			var body := RigidBody3D.new()

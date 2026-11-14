@@ -22,20 +22,23 @@ add_subdirectory(box3d)
 # Keep the original-maintainer submodule pristine. Both build systems use the
 # same checked source overlay for the CCD -> speculative-contact handoff fix.
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
-set(BOX3D_CORRECTED_DISTANCE "${CMAKE_CURRENT_BINARY_DIR}/box3d-patched/distance.c")
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-	"${CMAKE_CURRENT_SOURCE_DIR}/box3d/src/distance.c"
 	"${CMAKE_CURRENT_SOURCE_DIR}/scripts/prepare_box3d.py"
 )
-execute_process(
-	COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/prepare_box3d.py"
-		"${CMAKE_CURRENT_SOURCE_DIR}/box3d/src/distance.c" "${BOX3D_CORRECTED_DISTANCE}"
-	COMMAND_ERROR_IS_FATAL ANY
-)
 get_target_property(BOX3D_CORE_SOURCES box3d SOURCES)
-list(REMOVE_ITEM BOX3D_CORE_SOURCES distance.c)
+foreach(BOX3D_SOURCE distance.c shape.c)
+	set(BOX3D_ORIGINAL "${CMAKE_CURRENT_SOURCE_DIR}/box3d/src/${BOX3D_SOURCE}")
+	set(BOX3D_CORRECTED "${CMAKE_CURRENT_BINARY_DIR}/box3d-patched/${BOX3D_SOURCE}")
+	set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${BOX3D_ORIGINAL}")
+	execute_process(
+		COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/prepare_box3d.py"
+			"${BOX3D_ORIGINAL}" "${BOX3D_CORRECTED}"
+		COMMAND_ERROR_IS_FATAL ANY
+	)
+	list(REMOVE_ITEM BOX3D_CORE_SOURCES "${BOX3D_SOURCE}")
+	list(APPEND BOX3D_CORE_SOURCES "${BOX3D_CORRECTED}")
+endforeach()
 set_property(TARGET box3d PROPERTY SOURCES "${BOX3D_CORE_SOURCES}")
-target_sources(box3d PRIVATE "${BOX3D_CORRECTED_DISTANCE}")
 
 # Box3D is a static library embedded in the GDExtension. Keep it relocatable so Debug builds
 # instrumented by sanitizers can still be linked into the shared library on ELF platforms.

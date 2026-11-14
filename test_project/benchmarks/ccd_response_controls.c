@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 static int run_case(int rate, int substeps, float radius, float speed, int kind,
-		b3BodyType target_type, int workers, float restitution, bool grazing) {
+		b3BodyType target_type, int workers, float restitution, bool grazing, int geometry) {
 	b3WorldDef world_def = b3DefaultWorldDef();
 	world_def.gravity = b3Vec3_zero;
 	world_def.workerCount = workers;
@@ -14,6 +14,7 @@ static int run_case(int rate, int substeps, float radius, float speed, int kind,
 	b3BodyDef target_def = b3DefaultBodyDef();
 	target_def.type = target_type;
 	target_def.position = (b3Pos){50, 40, 0};
+	if (geometry == 2) target_def.position = (b3Pos){30, 40, -20};
 	target_def.enableSleep = false;
 	b3BodyId target = b3CreateBody(world, &target_def);
 	b3Transform offset = b3Transform_identity;
@@ -23,7 +24,23 @@ static int run_case(int rate, int substeps, float radius, float speed, int kind,
 	shape_def.density = 50000;
 	shape_def.baseMaterial.friction = 0;
 	shape_def.baseMaterial.restitution = restitution;
-	b3CreateHullShape(target, &shape_def, &plate.base);
+	b3MeshData *mesh = NULL;
+	b3HeightFieldData *height_field = NULL;
+	if (geometry == 1) {
+		b3Vec3 vertices[] = {{-20, 0, -20}, {-20, 0, 20}, {20, 0, -20}, {20, 0, 20}};
+		int32_t indices[] = {0, 1, 2, 2, 1, 3};
+		b3MeshDef mesh_def = {.vertices = vertices, .indices = indices, .vertexCount = 4, .triangleCount = 2, .identifyEdges = true};
+		mesh = b3CreateMesh(&mesh_def, NULL, 0);
+		b3CreateMeshShape(target, &shape_def, mesh, (b3Vec3){1, 1, 1});
+	} else if (geometry == 2) {
+		float heights[4] = {0};
+		b3HeightFieldDef height_def = {.heights = heights, .scale = {40, 1, 40}, .countX = 2, .countZ = 2,
+			.globalMinimumHeight = -1, .globalMaximumHeight = 1};
+		height_field = b3CreateHeightField(&height_def);
+		b3CreateHeightFieldShape(target, &shape_def, height_field);
+	} else {
+		b3CreateHullShape(target, &shape_def, &plate.base);
+	}
 	float support = kind == 2 ? 2 * radius : radius;
 	b3BodyDef body_def = b3DefaultBodyDef();
 	body_def.type = b3_dynamicBody;
@@ -78,11 +95,13 @@ static int run_case(int rate, int substeps, float radius, float speed, int kind,
 		failed |= max_rebound < 0.45f * fminf(speed, 398.0f) || max_rebound > 0.55f * fminf(speed, 398.0f);
 	}
 	if (failed) {
-		printf("FAIL rate=%d substeps=%d radius=%g speed=%g kind=%d target=%d workers=%d bounce=%g grazing=%d min_y=%g vx=%g vy=%g rebound=%g\n",
-			rate, substeps, (double)radius, (double)speed, kind, target_type, workers, (double)restitution, grazing,
+		printf("FAIL rate=%d substeps=%d radius=%g speed=%g kind=%d target=%d geometry=%d workers=%d bounce=%g grazing=%d min_y=%g vx=%g vy=%g rebound=%g\n",
+			rate, substeps, (double)radius, (double)speed, kind, target_type, geometry, workers, (double)restitution, grazing,
 			(double)min_y, (double)velocity.x, (double)velocity.y, (double)max_rebound);
 	}
 	b3DestroyWorld(world);
+	if (mesh) b3DestroyMesh(mesh);
+	if (height_field) b3DestroyHeightField(height_field);
 	return failed;
 }
 
@@ -96,19 +115,21 @@ int main(void) {
 			for (int s = 0; s < 3; ++s) {
 				for (int n = 0; n < 3; ++n) {
 					for (int kind = 0; kind < 3; ++kind) {
-						failures += run_case(rate, substeps[n], radii[r], speeds[s], kind, b3_staticBody, 1, 0, false);
-						cases++;
+						for (int geometry = 0; geometry < 3; ++geometry) {
+							failures += run_case(rate, substeps[n], radii[r], speeds[s], kind, b3_staticBody, 1, 0, false, geometry);
+							cases++;
+						}
 					}
 				}
 			}
 		}
 		for (int kind = 0; kind < 3; ++kind) {
 			for (int target = b3_staticBody; target <= b3_dynamicBody; ++target) {
-				failures += run_case(rate, 4, 0.01f, 300, kind, (b3BodyType)target, 4, 0, false);
+				failures += run_case(rate, 4, 0.01f, 300, kind, (b3BodyType)target, 4, 0, false, 0);
 				cases++;
 			}
-			failures += run_case(rate, 4, 0.01f, 300, kind, b3_staticBody, 1, 0.5f, false);
-			failures += run_case(rate, 4, 0.01f, 300, kind, b3_staticBody, 1, 0, true);
+			failures += run_case(rate, 4, 0.01f, 300, kind, b3_staticBody, 1, 0.5f, false, 0);
+			failures += run_case(rate, 4, 0.01f, 300, kind, b3_staticBody, 1, 0, true, 0);
 			cases += 2;
 		}
 	}
