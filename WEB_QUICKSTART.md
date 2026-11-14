@@ -2,6 +2,12 @@
 
 Godot Web exports can load `godot-box3d` when the extension side module and the Godot Web template are built with matching dynamic-link settings. This repository uses a supported single-threaded profile with Godot 4.7 and Emscripten 4.0.20.
 
+Current source builds pin our maintained [native Box3D fork](https://github.com/waskosky/box3d).
+They include the [CCD response correction](docs/ccd-response.md), which is **not**
+in the frozen preview-4 downloads below. Use matching newly built native/Web
+artifacts when you need that fix; an old embedded template cannot be updated by
+copying a newer archive beside it.
+
 ## Fastest route: use a prebuilt Web bundle
 
 For the current preview, use **Godot 4.7** and install the [preview 4 native editor addon](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.4/godot-box3d-embedded-native-editor.zip). Download its matching [Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.4/godot-box3d-web-release.zip) and [SHA-256 checksum](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.4/godot-box3d-web-release.zip.sha256). Both use qualified runtime source `14a4f86`, including dense-mesh/internal-edge fixes and world-anchored joints. When upgrading from preview 2, read the [material](docs/behavior-differences.md#physics-materials) and [motor retuning](docs/behavior-differences.md#hinge-motor-impulse-budget) notes. Preview 4 costs more to construct large terrain; see its [qualification and limits](docs/web-preview.md). For development snapshots, download the `godot-box3d-web-release` artifact from a successful [Web build and smoke run](https://github.com/waskosky/godot-box3d-embedded/actions/workflows/web.yml). Match the addon and Web files to the same qualified source revision.
@@ -59,6 +65,8 @@ Requirements:
 From the repository root, run:
 
 ```bash
+git submodule sync --recursive
+git submodule update --init --recursive
 MAX_JOBS=4 scripts/quickstart_web.sh
 ```
 

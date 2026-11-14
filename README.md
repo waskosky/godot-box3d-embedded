@@ -8,10 +8,12 @@ We maintain static embedding into custom Godot Web templates, application execut
 
 **Status: experimental.** Passing regressions establish a development baseline. Device support, startup latency, sustained frame pacing, and memory budgets require qualification for the application using the backend. See [physics readiness](docs/physics-readiness.md) and [release qualification](docs/release-qualification.md).
 
-**CCD source correction:** builds from this branch include a native correction
-for fast rounded shapes crossing thin surfaces after initial CCD impact. CMake
-and SCons apply the same checked source overlay; the original-maintainer Box3D
-dependency stays unchanged. See [the correction and regression scope](docs/ccd-response.md).
+**Maintained native engine:** builds from this branch pin
+[waskosky/box3d](https://github.com/waskosky/box3d), our maintenance fork of
+Erin Catto's engine. Native fixes are maintained and tested there without waiting
+for upstream acceptance. The thin-surface CCD response correction is part of
+that source; CMake and SCons compile it directly, without a patching overlay.
+See [the correction and regression scope](docs/ccd-response.md).
 The previously published **preview 4 binaries still contain this defect**,
 including failures at 30/60/120 Hz. Rebuild matching native/Web artifacts to
 use the correction; do not combine an old static template with a new addon.
@@ -62,7 +64,22 @@ The upstream maintainer [prefers a small Web build](https://github.com/bearlikel
 - `integration/next` is the advancing feed for features and experiments. Development consumers can follow it; deployments should retain an immutable, qualified commit and its artifacts.
 - `upstream/main` is the Git remote-tracking reference for bearlikelion's project. Upstream pull requests start from that reference and contain only their focused change.
 
-Downstream `main` periodically promotes a tested integration snapshot. Keep baseline fixes and documentation in `integration/next` too. We track Godot, godot-cpp, Emscripten, and the original `erincatto/box3d` repository in [dependencies.lock](dependencies.lock). Consumer-specific application code and deployment configuration are maintained by their hosts.
+Downstream `main` periodically promotes a tested integration snapshot. Keep baseline fixes and documentation in `integration/next` too. We track Godot, godot-cpp, Emscripten, and our maintained `waskosky/box3d` engine fork in [dependencies.lock](dependencies.lock). The native submodule and build scripts pin the same full commit; they do not follow a moving branch during builds. Consumer-specific application code and deployment configuration are maintained by their hosts.
+
+Native engine fixes land in `waskosky/box3d`, pass its focused regressions and
+native suite, then are pinned and qualified here for ordinary and static Web.
+`erincatto/box3d` remains the original project and a source of reviewed updates,
+not a dependency on upstream accepting our fixes. Upstream reports and any
+eventual contributions are separate from our ability to ship a validated fix.
+
+When updating an existing checkout, synchronize the dependency URL before
+initializing the pinned commits:
+
+```sh
+git submodule sync --recursive
+git submodule update --init --recursive
+scripts/bootstrap_dependencies.sh --check
+```
 
 ## Physics support
 

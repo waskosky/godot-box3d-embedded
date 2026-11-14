@@ -69,7 +69,7 @@ lock = parse_lock(REPO_ROOT / "dependencies.lock")
 module_files = [Path("examples/godot_static/box3d_static") / name for name in ("config.py", "SCsub", "register_types.h", "register_types.cpp")]
 support = [Path(name) for name in ("README.md", "LICENSE", "THIRD_PARTY_NOTICES.md", "dependencies.lock", "patches/godot-4.7/web-worker-readback.patch")]
 support += module_files + [Path(path) for path in subprocess.check_output(["git", "ls-files", "docs"], cwd=REPO_ROOT, text=True).splitlines()]
-build_inputs = module_files + [Path(name) for name in ("dependencies.lock", "SConstruct", "scripts/prepare_box3d.py", "scripts/build_web_static.sh", "scripts/build_web_static_templates.sh", "patches/godot-4.7/web-worker-readback.patch")]
+build_inputs = module_files + [Path(name) for name in ("dependencies.lock", "SConstruct", "scripts/build_web_static.sh", "scripts/build_web_static_templates.sh", "patches/godot-4.7/web-worker-readback.patch")]
 artifacts = []
 for target in targets:
     variant = target.removeprefix("template_")

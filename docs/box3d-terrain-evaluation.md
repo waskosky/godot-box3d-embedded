@@ -3,7 +3,9 @@
 This isolated branch evaluates original-maintainer Box3D commit
 `be8c7318901dbb14b9fbb26fe0a7a48850f53b0e` (November 13), including the
 [mesh ghost-contact work](https://github.com/erincatto/box3d/pull/212) and its
-follow-up fixes. The dependency URL remains `https://github.com/erincatto/box3d.git`.
+follow-up fixes. That evaluation used `https://github.com/erincatto/box3d.git`.
+Current source builds use the maintained `waskosky/box3d` fork, which carries
+this terrain baseline plus the [CCD response correction](ccd-response.md).
 It starts from downstream `c91a27b`; preview 3 retains its tested `f36d061` pin.
 The candidate was functionally qualified for the downstream integration feed as
 described below, and is now included with world-joint support in

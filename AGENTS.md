@@ -7,7 +7,9 @@
 - Validate a new static host module/template with the existing browser physics smoke scene. Archive-only checks and ordinary dynamic-extension CI do not qualify the static profile.
 - Use the manual static Web workflow for the embedded profile. Keep its build receipt and actual browser results together; compare page responsiveness and physics worker counts independently when investigating performance.
 - Keep the example host module generic. Private consumer code, identifiers, and deployment configuration do not belong in public changes.
-- Dependency upgrades must review the checked CCD source correction in `scripts/prepare_box3d.py`. Keep CMake and SCons on the same corrected source; retain the original-maintainer URL and never silently drop the correction or qualify an old static template as fixed.
+- Native engine work belongs in `https://github.com/waskosky/box3d.git`. Keep `.gitmodules`, `dependencies.lock`, validation and package receipts on that fork with a tested immutable commit. `erincatto/box3d` is an attribution/sync source, not the production dependency or a release gate; do not revert this policy without explicit user direction.
+- Maintain and validate needed native fixes in the engine fork without waiting for upstream acceptance. Review upstream updates deliberately and preserve downstream fixes. CMake and SCons compile the same pinned native source directly; do not reintroduce adapter-side source overlays.
+- Keep the CCD response regression in the native fork and reuse it here. Never drop the correction during a dependency update or qualify an old static template as fixed; relink and test matching artifacts.
 
 ## Upstream pull requests
 

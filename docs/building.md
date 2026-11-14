@@ -6,6 +6,10 @@ title: Building from source
 
 These instructions build the downstream fork. The [static Web embedding guide](static-embedding.md) covers the custom worker-main host; the [Web quick start](../WEB_QUICKSTART.md) covers ordinary extension exports.
 
+The native engine is pinned to our maintained
+[`waskosky/box3d`](https://github.com/waskosky/box3d) fork. Engine fixes live there,
+not in an adapter-side patch script, and do not depend on upstream accepting them.
+
 ## Requirements
 
 - CMake 3.22 or newer
@@ -23,9 +27,10 @@ cmake -B build
 cmake --build build --parallel
 ```
 
-If you cloned without `--recurse-submodules`:
+If you cloned without `--recurse-submodules`, or are updating an older checkout:
 
 ```sh
+git submodule sync --recursive
 git submodule update --init --recursive
 ```
 

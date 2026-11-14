@@ -1,6 +1,6 @@
 # CCD impact-to-response correction
 
-This downstream source correction addresses the native thin-surface failure
+This native engine correction addresses the thin-surface failure
 recorded in [preview 4](edge-qualification.md#thin-hull-ccd-is-an-open-engine-defect).
 The already-published preview-4 binaries/templates are unchanged and affected.
 
@@ -35,18 +35,20 @@ expect replay compatibility with uncorrected binaries.
 
 ## Build and dependency policy
 
-`box3d` and `dependencies.lock` still pin original-maintainer
-`erincatto/box3d` at `be8c731`. `scripts/prepare_box3d.py` verifies the upstream
-`distance.c` and `shape.c` checksums and stages corrected copies in the build
-directory. Both CMake and SCons compile those copies instead of the originals.
-The submodule stays clean, including static-template builds; a dependency/source
-change fails closed until this correction is reviewed. CRLF checkouts are supported.
+`box3d` and `dependencies.lock` now pin the maintained
+[`waskosky/box3d`](https://github.com/waskosky/box3d) fork. The correction lives
+directly in its `src/distance.c` and `src/shape.c`, based on upstream `be8c731`.
+Both CMake and SCons compile the same pinned source. The former
+`scripts/prepare_box3d.py` overlay has been removed; the engine fork owns the fix
+and its native regression, so upstream acceptance is not a release gate.
+Review upstream updates while retaining that coverage; do not switch the
+dependency back to uncorrected upstream code.
 
 Normal native, ordinary Web and static Web build commands require no new
 option. Build matching native editor libraries and Web artifacts from the
 same source. A static host **must be relinked**; copying a new side module or
 archive beside an old template cannot update its embedded physics engine.
-Package receipts identify the source overlay as well as the upstream pin.
+Package receipts identify the native fork URL and immutable source pin.
 
 ## Focused regressions
 
@@ -56,11 +58,12 @@ Package receipts identify the source overlay as well as the upstream pin.
   support-side containment, stopping response and preserved tangential travel.
   It waits for the requested physics step before launching, avoiding the
   startup-rate coverage bug in the earlier diagnostic.
-- `test_project/benchmarks/ccd_response_controls.c`: 774 independent native
+- `box3d/test/test_ccd_response.c`: 774 independent native
   cases across sizes, speeds, 1/4/8 substeps and hull/mesh/heightfield targets,
   plus four-worker static, kinematic and dynamic targets, restitution and grazing
   controls. CMake's `check-ccd-response` target runs them; the normal headless
-  runner includes it.
+  runner includes it. The engine's own test suite runs the same `CCDResponseTest`;
+  there is no second copy of those controls in the adapter.
 - The Web smoke scene requires 18 small-projectile response cases on thin boxes
   and meshes, on floors, walls and ceilings with sphere/box/capsule movers, in
   addition to its prior physics checks. It does not change the scene's tick rate.
@@ -72,6 +75,8 @@ control passes 774/774. The new Godot regression also fails against the
 unchanged preview-4 library. These negative controls demonstrate that the
 tests exercise the defect rather than just detecting a loaded backend.
 
+The original source-overlay qualification described below used a pristine
+upstream checkout, before the correction moved into the native fork.
 The local scalar Debug build also passes all 774 controls with UBSan enabled.
 Of the 28 upstream core test groups, 27 pass unchanged. The remaining group
 first asserts the old exact ragdoll trajectory: the corrected single-precision
@@ -82,7 +87,7 @@ worker-count and SIMD-width equality checks. No original test or assertion in
 the dependency checkout is modified. This is local repeatability evidence,
 not a claim of an unchanged upstream suite or cross-platform replay identity.
 
-## Matching-build qualification
+## Original source-overlay qualification
 
 Runtime candidate `bf68b12767d311587c3781a7bda843c552d3c108` was tested on
 2026-11-14. The final documentation-only follow-up does not change that runtime.

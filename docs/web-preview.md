@@ -4,7 +4,7 @@ title: Web preview qualification
 
 # Web preview qualification
 
-Current functionally qualified physics snapshot: `14a4f861352737838b40d722430e5184e6275d20`.
+Latest published preview physics snapshot: `14a4f861352737838b40d722430e5184e6275d20`.
 Download the matching native editor addon, static bundle or ordinary Web package
 from [Web preview 4](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.4).
 This is an experimental development milestone, not production, rendered-frame,
@@ -13,13 +13,18 @@ their immutable evidence are retained below for comparison and rollback.
 Documentation and regression-only follow-ups do not change the tested physics
 source or replace its artifact identity. Ordinary Web CI does not qualify static embedding.
 
+Current source builds use the maintained `waskosky/box3d` engine fork and include
+the [CCD response correction](ccd-response.md). The historical preview artifacts
+below remain unchanged and affected by the reproduced CCD defect. Their original
+dependency URLs and source receipts are retained as historical evidence.
+
 ## Web preview 4 (2026-11-14)
 
 Runtime source `14a4f86` uses original-maintainer Box3D `be8c731` and adds
 dense-mesh support, internal-edge adjacency with original ray-face indices,
 and world-anchored pin/hinge/slider joints with deferred endpoint lifecycle.
 It retains preview 3's filters/materials and hinge impulse correction. The
-dependency remains `https://github.com/erincatto/box3d.git`.
+dependency for these frozen artifacts is `https://github.com/erincatto/box3d.git`.
 
 - [Native qualification](https://github.com/waskosky/godot-box3d-embedded/actions/runs/43560483117):
   all 48 physics tests on Linux, Windows and universal macOS, Godot 4.3

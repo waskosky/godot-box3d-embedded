@@ -267,9 +267,9 @@ def main() -> int:
             "complete": not missing,
             "missing": missing,
             "source": source_provenance(),
-            "box3d_source_correction": {"path": "scripts/prepare_box3d.py", "sha256": sha256(REPO_ROOT / "scripts/prepare_box3d.py")},
             "dependencies": {
                 "godot_cpp_ref": lock_values.get("GODOT_CPP_REF"),
+                "box3d_repository": lock_values.get("BOX3D_REPOSITORY"),
                 "box3d_ref": lock_values.get("BOX3D_REF"),
                 "godot_engine_ref": lock_values.get("GODOT_ENGINE_REF"),
                 "emsdk_ref": lock_values.get("EMSDK_REF"),

@@ -19,7 +19,7 @@ STATIC_WEB_ARCHIVES = {
     "godot-cpp": "bin/web/static/libgodot-cpp.web.template_release.wasm32.a",
 }
 PINNED_REFS = {
-    "BOX3D_REF": "be8c7318901dbb14b9fbb26fe0a7a48850f53b0e",
+    "BOX3D_REF": "f3c62759239f662fb9c8463c1108cfb2f74047ef",
     "GODOT_CPP_REF": "fbbf9ec4efd8f1055d00edb8d926eef8ba4c2cce",
     "GODOT_ENGINE_REF": "5b4e0cb0fd279832bbdd69fed5354d4e5ad26f88",
     "EMSDK_REF": "e4fe26ef59168ff44f4c23c466e497bf60b3411e",
@@ -98,19 +98,19 @@ def main() -> int:
         for key, expected in PINNED_REFS.items():
             if lock.get(key) != expected:
                 errors.append(f"{key} must be pinned to {expected}")
-        if lock.get("BOX3D_REPOSITORY") != "https://github.com/erincatto/box3d.git":
-            errors.append("BOX3D_REPOSITORY must use the original maintainer repository")
+        if lock.get("BOX3D_REPOSITORY") != "https://github.com/waskosky/box3d.git":
+            errors.append("BOX3D_REPOSITORY must use the maintained waskosky/box3d fork")
         for key in ("SCONS_VERSION", "EMSCRIPTEN_VERSION"):
             if not lock.get(key):
                 errors.append(f"Missing toolchain pin: {key}")
     checks.append("Reproducible source and toolchain pins")
 
     gitmodules = (REPO_ROOT / ".gitmodules").read_text(encoding="utf-8")
-    if "https://github.com/erincatto/box3d.git" not in gitmodules:
-        errors.append(".gitmodules must use the original Box3D repository")
+    if "https://github.com/waskosky/box3d.git" not in gitmodules:
+        errors.append(".gitmodules must use the maintained waskosky/box3d fork")
     if "https://github.com/godotengine/godot-cpp.git" not in gitmodules:
         errors.append(".gitmodules must define the godot-cpp source dependency")
-    checks.append("Official dependency repositories")
+    checks.append("Maintained Box3D fork and official toolchain repositories")
 
     sconstruct_path = REPO_ROOT / "SConstruct"
     if not sconstruct_path.is_file():
