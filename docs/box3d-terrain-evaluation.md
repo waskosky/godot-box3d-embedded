@@ -5,9 +5,10 @@ This isolated branch evaluates original-maintainer Box3D commit
 [mesh ghost-contact work](https://github.com/erincatto/box3d/pull/212) and its
 follow-up fixes. The dependency URL remains `https://github.com/erincatto/box3d.git`.
 It starts from downstream `c91a27b`; preview 3 retains its tested `f36d061` pin.
-The candidate is functionally qualified for the downstream integration feed as
-described below. Preview 3 and the reviewed `main` baseline remain unchanged;
-this is not a new release or hardware/device certification.
+The candidate was functionally qualified for the downstream integration feed as
+described below, and is now included with world-joint support in
+[preview 4](web-preview.md#web-preview-4-2026-11-14). Preview 3 retains its original
+artifacts for rollback. This record is not hardware/device certification.
 
 ## Focused integration
 

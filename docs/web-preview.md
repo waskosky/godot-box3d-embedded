@@ -4,14 +4,67 @@ title: Web preview qualification
 
 # Web preview qualification
 
-Current functionally qualified physics snapshot: `c91a27b86820990233f7a73f2297d8a4f17ac1b5`.
+Current functionally qualified physics snapshot: `14a4f861352737838b40d722430e5184e6275d20`.
 Download the matching native editor addon, static bundle or ordinary Web package
-from [Web preview 3](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.3).
+from [Web preview 4](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.4).
 This is an experimental development milestone, not production, rendered-frame,
 hardware performance or physical-device certification. Earlier releases and
 their immutable evidence are retained below for comparison and rollback.
 Documentation and regression-only follow-ups do not change the tested physics
 source or replace its artifact identity. Ordinary Web CI does not qualify static embedding.
+
+## Web preview 4 (2026-11-14)
+
+Runtime source `14a4f86` uses original-maintainer Box3D `be8c731` and adds
+dense-mesh support, internal-edge adjacency with original ray-face indices,
+and world-anchored pin/hinge/slider joints with deferred endpoint lifecycle.
+It retains preview 3's filters/materials and hinge impulse correction. The
+dependency remains `https://github.com/erincatto/box3d.git`.
+
+- [Native qualification](https://github.com/waskosky/godot-box3d-embedded/actions/runs/43560483117):
+  all 48 physics tests on Linux, Windows and universal macOS, Godot 4.3
+  compatibility, scalar UBSan runtime, macOS ASan runtime and sanitizer builds.
+- [Ordinary Web](https://github.com/waskosky/godot-box3d-embedded/actions/runs/43560485742):
+  matching Debug/Release side modules and templates, Chromium smoke and complete
+  packaging.
+- [Static worker-main Web](https://github.com/waskosky/godot-box3d-embedded/actions/runs/43560488286):
+  newly linked Debug/Release templates pass 16 physics/backend checks in both
+  Chromium and Firefox. Both Release workloads complete six construction,
+  movement and cleanup cycles with stable post-warm-up node/resource counts.
+
+The static template SHA-256 values are:
+
+- Release: `2e4e825facbcfd1cc1b58eedc282674174d25287d572e16c8cf726f71bff3e55`
+- Debug: `f2e00e978f98edbe12ad10e3b979bde550c5cf6bb8381e178926196d18874be1`
+
+The combined smoke fixture adds the submitted-result-frame fence. It passes
+all 17 physics/backend/render-submission checks against those exact static
+templates in both browsers and both targets. Ordinary Release passes all 17
+checks plus a reload with the exact CI side module and template, including
+Firefox HTTP 304 revalidation. Fixture/export receipts and inspected frames are
+included with the qualification evidence. No physics assertions were relaxed.
+The final integration merge `02f3c88` also passes
+[native CI](https://github.com/waskosky/godot-box3d-embedded/actions/runs/43582081830)
+and [ordinary Web CI](https://github.com/waskosky/godot-box3d-embedded/actions/runs/43582081836).
+Runtime inputs are unchanged from the separately qualified frozen binaries;
+original compiler build manifests remain intact. Refreshed support documentation
+is identified by `RELEASE_DOCUMENTATION.json`.
+
+Large terrain construction and live shared-resource edits cost more. Adjacency
+is within one mesh, not between separate terrain tiles. See the
+[terrain tradeoff](box3d-terrain-evaluation.md#construction-tradeoff) and
+[world-joint conventions](behavior-differences.md#ignored-joint-parameters).
+Do not mix preview 4 native libraries or Web files with preview 3 templates.
+
+These functional browser receipts use software graphics. Some inspected frames
+retain missing glyphs despite all markers passing. WebKit's full-scene
+scene/canvas shader failures also reproduce with official templates and
+GodotPhysics without Box3D; WebKit acceptance still fails. Real-GPU visual and
+performance acceptance, physical Android/iPhone, startup/frame/memory budgets
+and background/resume remain open. See the
+[capture investigation](web-capture-diagnosis.md) and
+[release acceptance guide](release-qualification.md). Preview 3 remains available
+for rollback; this release is still experimental, not production certification.
 
 ## Web preview 3 (2026-11-14)
 

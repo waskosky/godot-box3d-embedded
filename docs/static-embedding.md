@@ -10,7 +10,7 @@ The purpose is to run the application main loop in a worker while the browser ow
 
 ## Use the prebuilt preview
 
-[Web preview 3](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.3) contains matching artifacts for Godot 4.7, including live filters/materials and corrected joint motor units:
+[Web preview 4](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.4) contains matching artifacts for Godot 4.7, including the newer terrain contacts and world-anchored joints:
 
 1. Install `godot-box3d-embedded-native-editor.zip` by copying its `addons/godot-box3d/` into your project. Select **Box3D Physics** and the Compatibility renderer.
 2. Extract `godot-box3d-embedded-static-web.zip`. Set the Web preset's custom Debug and Release template paths to the ZIPs in its `templates/` directory.
@@ -20,8 +20,9 @@ Verify the accompanying `.sha256` files and keep native and Web artifacts from t
 
 Upgrading from preview 2 changes material combining and hinge motor strength.
 Read the [migration notes](behavior-differences.md#hinge-motor-impulse-budget)
-before reusing tuned scenes. Preview 3 does not include the newer Box3D terrain
-dependency experiment or claim real-device/performance qualification.
+before reusing tuned scenes. Preview 4 includes the terrain dependency upgrade,
+with higher construction/update costs. It does not claim real-device,
+rendered-frame or performance qualification.
 
 ## Build both templates
 

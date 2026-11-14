@@ -10,28 +10,24 @@ We maintain static embedding into custom Godot Web templates, application execut
 
 ## Try the prebuilt Web preview
 
-The integration feed includes the [qualified newer-engine mesh/terrain candidate](docs/box3d-terrain-evaluation.md),
-not a new released preview. Native/sanitizer, ordinary Web, and matching static
-Debug/Release browser checks pass. Large terrain construction costs more; device,
-visual and performance acceptance remain separate gates. The prebuilt artifacts
-below retain preview 3's older dependency pin and documented limits.
+Use **Godot 4.7** with [Web preview 4](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.4). Install its [native editor addon](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.4/godot-box3d-embedded-native-editor.zip) by copying `addons/godot-box3d/` into your project, then select **Box3D Physics** and the Compatibility renderer.
 
-Use **Godot 4.7** with [Web preview 3](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.3). Install its [native editor addon](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.3/godot-box3d-embedded-native-editor.zip) by copying `addons/godot-box3d/` into your project, then select **Box3D Physics** and the Compatibility renderer.
+For worker-main execution, download the [static Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.4/godot-box3d-embedded-static-web.zip) and follow [static embedding](docs/static-embedding.md#use-the-prebuilt-preview) to select its Debug/Release templates. For an ordinary extension export, use the [ordinary Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.4/godot-box3d-web-release.zip) and [Web quick start](WEB_QUICKSTART.md). Keep the files from the same release together and verify the accompanying checksums.
 
-For worker-main execution, download the [static Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.3/godot-box3d-embedded-static-web.zip) and follow [static embedding](docs/static-embedding.md#use-the-prebuilt-preview) to select its Debug/Release templates. For an ordinary extension export, use the [ordinary Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.3/godot-box3d-web-release.zip) and [Web quick start](WEB_QUICKSTART.md). Keep the files from the same release together and verify the accompanying checksums.
+Preview 4 adds [dense-mesh and internal-edge contact fixes](docs/box3d-terrain-evaluation.md) and [world-anchored pin/hinge/slider joints with safe endpoint lifecycle](docs/world-joint-qualification.md). Its native libraries and Web templates use qualified runtime source `14a4f86` and original-maintainer Box3D `be8c731`. It retains preview 3's live filters/materials and corrected joint motor units. See [Web preview qualification](docs/web-preview.md) for exact artifacts and limits. Support documentation and smoke-fixture revisions are identified separately from the frozen binaries.
 
-Preview 3 includes live collision-filter edits, live material updates/Godot-style mixing, joint setup/wake-up fixes and corrected hinge motor impulse units, as well as preview 2's motion-query fixes. Its native libraries and Web templates use qualified source `c91a27b`; see [Web preview qualification](docs/web-preview.md) for the exact artifacts and validation limits. Release documentation identifies its revision separately from those frozen binaries.
-
-The release includes [qualification evidence](docs/web-preview.md): bounded physics and cleanup pass in Chromium and Firefox on Linux software GL. Local Firefox timeouts, software-rendered text artifacts, hardware performance, WebKit and physical mobile acceptance remain explicit limits.
+The release includes [qualification evidence](docs/web-preview.md): bounded physics and cleanup pass in Chromium and Firefox on Linux software GL. Intermittent text artifacts, WebKit shader failures, hardware performance and physical mobile acceptance remain explicit limits. A submitted smoke-result frame does not certify pixel correctness.
 
 When upgrading from preview 2, revisit [material tuning](docs/behavior-differences.md#physics-materials)
 and [hinge motor limits](docs/behavior-differences.md#hinge-motor-impulse-budget).
 An unchanged motor cap now permits 60 times the previous maximum torque at
 60 Hz and time scale 1. To preserve a previous torque setting, use
 `max_impulse = desired_torque * physics_step_seconds`. Scaling remains unsupported;
-the new warnings do not add scaling support. Preview 3 retains the same pinned
-Box3D version; newer terrain-engine experiments are not part of its binaries.
-Preview 3 also retains [known dense-mesh and internal-edge contact limitations](docs/behavior-differences.md#mesh-contact-limits-in-preview-3).
+the new warnings do not add scaling support. Preview 4's terrain upgrade fixes
+the reproduced dense-mesh support and internal-edge cases, but large terrain
+construction and shared-resource edits cost more. Adjacency is within a mesh,
+not across separate terrain tiles. [Preview 3](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.3)
+remains available for rollback with its [documented mesh limitations](docs/behavior-differences.md#mesh-contact-limits-in-preview-3).
 
 ## Choose a Web build
 
@@ -64,11 +60,11 @@ Downstream `main` periodically promotes a tested integration snapshot. Keep base
 
 The fork covers rigid/static/kinematic bodies, areas, direct queries, character motion, pin/hinge/slider joints, and primitive, convex, trimesh, heightmap, world-boundary, and query-only separation-ray shapes. Focused regressions cover shared resources, terrain and contact geometry, animated platforms, and rigid-body behavior.
 
-The advancing integration candidate also supports one-body world anchors for
+The current preview also supports one-body world anchors for
 pin, hinge and slider joints, including deferred space attachment and safe
 endpoint teardown. See its [matching native/Web qualification](docs/world-joint-qualification.md)
 and [joint conventions](docs/behavior-differences.md#ignored-joint-parameters).
-These additions are not in the separately linked preview 3 binaries.
+These additions are not in the retained preview 3 binaries.
 
 Read [behavior differences](docs/behavior-differences.md) before adopting it. Unsupported joints, soft bodies, concave sensor visitors, scaling restrictions, and remaining qualification gates are explicit in the [readiness guide](docs/physics-readiness.md). General installation and native build instructions are in [installation](docs/installation.md) and [building](docs/building.md).
 

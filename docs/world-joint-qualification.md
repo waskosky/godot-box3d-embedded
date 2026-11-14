@@ -63,7 +63,8 @@ still fails; backend startup or physics success does not excuse rendering errors
 Headed WebKit also reproduces the shader failure on this host.
 
 Physical Android/iPhone, real-GPU visual acceptance, application-specific
-startup/frame/memory budgets and background/resume remain open. Published
-preview 3 and the reviewed `main` baseline are unchanged. Keep each candidate's
-native addon, chosen Web profile and build receipts together; do not mix these
-newer runtime artifacts with preview 3 templates.
+startup/frame/memory budgets and background/resume remain open. This qualified
+runtime is included in [preview 4](web-preview.md#web-preview-4-2026-11-14) and
+promoted to the reviewed downstream baseline. Preview 3 remains available for
+rollback. Keep the native addon, chosen Web profile and build receipts together;
+do not mix these newer runtime artifacts with preview 3 templates.

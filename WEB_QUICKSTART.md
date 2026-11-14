@@ -4,7 +4,7 @@ Godot Web exports can load `godot-box3d` when the extension side module and the 
 
 ## Fastest route: use a prebuilt Web bundle
 
-For the current preview, use **Godot 4.7** and install the [preview 3 native editor addon](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.3/godot-box3d-embedded-native-editor.zip). Download its matching [Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.3/godot-box3d-web-release.zip) and [SHA-256 checksum](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.3/godot-box3d-web-release.zip.sha256). Both use qualified source `c91a27b`, including live filters/materials and corrected joint motor units. When upgrading from preview 2, read the [material](docs/behavior-differences.md#physics-materials) and [motor retuning](docs/behavior-differences.md#hinge-motor-impulse-budget) notes. For development snapshots, download the `godot-box3d-web-release` artifact from a successful [Web build and smoke run](https://github.com/waskosky/godot-box3d-embedded/actions/workflows/web.yml). Match the addon and Web files to the same qualified source revision.
+For the current preview, use **Godot 4.7** and install the [preview 4 native editor addon](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.4/godot-box3d-embedded-native-editor.zip). Download its matching [Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.4/godot-box3d-web-release.zip) and [SHA-256 checksum](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.4/godot-box3d-web-release.zip.sha256). Both use qualified runtime source `14a4f86`, including dense-mesh/internal-edge fixes and world-anchored joints. When upgrading from preview 2, read the [material](docs/behavior-differences.md#physics-materials) and [motor retuning](docs/behavior-differences.md#hinge-motor-impulse-budget) notes. Preview 4 costs more to construct large terrain; see its [qualification and limits](docs/web-preview.md). For development snapshots, download the `godot-box3d-web-release` artifact from a successful [Web build and smoke run](https://github.com/waskosky/godot-box3d-embedded/actions/workflows/web.yml). Match the addon and Web files to the same qualified source revision.
 
 The archive contains:
 
@@ -116,7 +116,10 @@ terrain, and an animated platform carries its character then stops cleanly.
 The heightmap character starts in the grid's negative half and crosses its
 center, so a corner-origin collision surface cannot satisfy the terrain check.
 Direct-query checks also require correct penetration pairs, rest normals,
-margin handling, ray inside/backface flags and mesh face indices. The Web
+margin handling, ray inside/backface flags and mesh face indices. It also checks
+dense-mesh support, internal-edge traversal and world-anchored pin/hinge/slider
+joints. The runner waits for a submitted result frame as well as physics PASS;
+inspect the screenshot separately for visual defects. The Web
 workflow runs this release-export smoke test in headless Chromium before it
 packages the bundle.
 
