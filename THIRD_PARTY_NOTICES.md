@@ -5,6 +5,10 @@ The native extension and Web side modules include these MIT-licensed dependencie
 - [Box3D](https://github.com/erincatto/box3d), copyright (c) 2026 Erin Catto.
 - [godot-cpp](https://github.com/godotengine/godot-cpp), copyright (c) 2017-present Godot Engine contributors.
 
+Current builds use the maintained [waskosky/box3d fork](https://github.com/waskosky/box3d)
+with downstream corrections, retaining the original Box3D attribution and license.
+The exact fork commit is pinned in `dependencies.lock` and recorded in build receipts.
+
 The custom Web templates include [Godot Engine](https://github.com/godotengine/godot):
 
 - Copyright (c) 2014-present Godot Engine contributors (see Godot's `AUTHORS.md`).

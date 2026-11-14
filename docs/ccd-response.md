@@ -50,6 +50,58 @@ same source. A static host **must be relinked**; copying a new side module or
 archive beside an old template cannot update its embedded physics engine.
 Package receipts identify the native fork URL and immutable source pin.
 
+The maintained native baseline is `f3c62759239f662fb9c8463c1108cfb2f74047ef`.
+Its corrected `distance.c` and `shape.c` are byte-for-byte identical to the
+source-overlay runtime qualified below; moving the correction does not introduce
+another physics change. The fork owns the 774-case regression and keeps all
+determinism assertions enabled. Local native Release runs pass all 29 test groups
+in single and double precision, with these updated CCD trajectory baselines:
+
+| Precision | Ragdoll sleep step / hash | Mesh-drop sleep step / hash |
+|---|---|---|
+| Single | 324 / `8CDCDB2A` | 188 / `53CC9371` |
+| Double | 368 / `B2E77EF9` | 188 / `4A875B5D` |
+
+These replace the uncorrected trajectories, not the worker-count or SIMD
+repeatability assertions. The original overlay evidence below retains its
+historical upstream-suite result; it is not the fork's current test baseline.
+
+The [native fork CI](https://github.com/waskosky/box3d/actions/runs/43633021834)
+passes all 19 jobs: native tests across Linux/macOS/Windows compilers and ARM64,
+optimized and double-precision variants, address/thread/memory sanitizer paths,
+Emscripten compilation, and sample builds. The checked goldens agree across the
+tested native configurations. This is not replay compatibility with old binaries.
+
+## Fork-source qualification
+
+Adapter runtime `c76c13045bbf2a498697fc4ace8c6a9c56b09f6d` builds the pinned
+native fork directly, without the former source overlay. Qualification on
+2026-11-14 includes the following; the subsequent qualification/attribution
+documentation commit does not change this runtime.
+
+- [Native adapter CI](https://github.com/waskosky/godot-box3d-embedded/actions/runs/43633172731):
+  Linux, Windows, universal macOS, minimum Godot 4.3, ASan and scalar UBSan
+  runtime checks each pass all 774 native controls and all 50 Godot tests.
+- [Ordinary Web](https://github.com/waskosky/godot-box3d-embedded/actions/runs/43633175287):
+  fresh extension/template builds, all 18 Chromium smoke markers, and packaging
+  pass. The package manifest records the maintained fork URL and native pin,
+  with no source-overlay dependency; the downloaded bundle checksum verifies.
+- [Static worker-main Web](https://github.com/waskosky/godot-box3d-embedded/actions/runs/43633178086):
+  freshly linked Release and Debug templates pass all 18 required smoke markers
+  in Chromium and Firefox. The Release workload passes six cycles per browser,
+  requesting eight physics workers, with stable cleanup counts and no reported
+  errors. Its package receipt identifies `waskosky/box3d` and the exact native
+  pin above; the downloaded bundle checksum verifies. The Release template hash
+  is `e748f401c84b6effaaf7f5f719d766fb6955d36ae3e2b3e181eba315f98ec492`.
+
+Visual inspection of these static Release frames again found readable text in
+Chromium and missing-glyph segments in Firefox. The ordinary Chromium capture
+also has missing-glyph segments, consistent with the previously recorded
+[intermittent text defect](web-capture-diagnosis.md). This source-ownership
+migration does not fix that rendering limitation. These software-graphics runs
+do not establish real-device performance budgets or replace published preview-4
+artifacts.
+
 ## Focused regressions
 
 - `test_project/tests/ccd_geometry_test.gd`: 144 cases at applied 30/60/120 Hz,
