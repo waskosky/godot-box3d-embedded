@@ -45,6 +45,7 @@ def required_checks(lines: list[str]) -> dict[str, bool]:
         "hinge_impulse": "Hinge motor impulse budget: PASS" in lines,
         "mesh_contacts": "Mesh seam/dense contacts: PASS" in lines,
         "physics": "RESULT: PASS" in lines,
+        "render_submission": "Smoke result frame submitted" in lines,
     }
 
 
@@ -88,6 +89,8 @@ def main() -> int:
     console_lines: list[str] = []
     errors: list[str] = []
     loads: list[dict[str, object]] = []
+    physics_pass_at: float | None = None
+    result_frame_at: float | None = None
     try:
         with sync_playwright() as playwright:
             launch_options: dict[str, object] = {"headless": not args.headed}
@@ -99,7 +102,12 @@ def main() -> int:
             page = browser.new_page(viewport={"width": 1280, "height": 720})
 
             def handle_console(message: object) -> None:
+                nonlocal physics_pass_at, result_frame_at
                 text = message.text
+                if text == "RESULT: PASS":
+                    physics_pass_at = time.monotonic()
+                elif text == "Smoke result frame submitted":
+                    result_frame_at = time.monotonic()
                 if message.type == "error" and (
                     text.startswith("ERROR:")
                     or "Aborted(" in text
@@ -115,6 +123,8 @@ def main() -> int:
             for attempt in range(args.reloads + 1):
                 console_lines.clear()
                 errors.clear()
+                physics_pass_at = None
+                result_frame_at = None
                 started = time.monotonic()
                 response = page.goto(
                     f"http://127.0.0.1:{port}/index.html",
@@ -122,10 +132,20 @@ def main() -> int:
                     timeout=int(args.timeout * 1000),
                 )
                 deadline = started + args.timeout
-                while "RESULT: PASS" not in console_lines and "RESULT: FAIL" not in console_lines and not errors and time.monotonic() < deadline:
+                while "Smoke result frame submitted" not in console_lines and "RESULT: FAIL" not in console_lines and not errors and time.monotonic() < deadline:
                     page.wait_for_timeout(100)
-                passed = bool(response and response.ok) and all(required_checks(console_lines).values()) and not errors
-                loads.append({"load": attempt, "seconds_to_physics_pass": round(time.monotonic() - started, 3), "ok": passed})
+                # Firefox exposes the server's successful cache revalidation as
+                # 304 on reload. Still require every fresh engine/result marker.
+                http_ok = response is not None and (response.ok or response.status == 304)
+                passed = http_ok and all(required_checks(console_lines).values()) and not errors
+                loads.append({
+                    "load": attempt,
+                    "http_status": response.status if response else None,
+                    "required": required_checks(console_lines),
+                    "seconds_to_physics_pass": round(physics_pass_at - started, 3) if physics_pass_at is not None else None,
+                    "seconds_to_result_frame": round(result_frame_at - started, 3) if result_frame_at is not None else None,
+                    "ok": passed,
+                })
                 if not passed:
                     break
             if loads[-1]["ok"] and args.observe_seconds:
