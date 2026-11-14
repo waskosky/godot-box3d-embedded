@@ -591,3 +591,9 @@ func _run_checks() -> void:
         for failure in failures:
             _append_status("FAIL: %s" % failure)
         _append_status("RESULT: FAIL")
+    # A console result precedes rendering. Keep the capture fence separate from
+    # physics success; frame submission does not certify pixels or target hardware.
+    await get_tree().process_frame
+    await RenderingServer.frame_post_draw
+    await RenderingServer.frame_post_draw
+    print("Smoke result frame submitted")
