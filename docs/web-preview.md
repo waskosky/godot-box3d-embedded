@@ -4,19 +4,26 @@ title: Web preview qualification
 
 # Web preview qualification
 
-Latest published preview physics snapshot: `14a4f861352737838b40d722430e5184e6275d20`.
 Download the matching native editor addon, static bundle or ordinary Web package
-from [Web preview 4](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.4).
+from [Web preview 5](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.5).
 This is an experimental development milestone, not production, rendered-frame,
 hardware performance or physical-device certification. Earlier releases and
 their immutable evidence are retained below for comparison and rollback.
 Documentation and regression-only follow-ups do not change the tested physics
 source or replace its artifact identity. Ordinary Web CI does not qualify static embedding.
 
-Current source builds use the maintained `waskosky/box3d` engine fork and include
-the [CCD response correction](ccd-response.md). The historical preview artifacts
-below remain unchanged and affected by the reproduced CCD defect. Their original
-dependency URLs and source receipts are retained as historical evidence.
+## Web preview 5
+
+This preview uses the maintained `waskosky/box3d` engine at `f3c6275` and includes
+the [thin-surface CCD response correction](ccd-response.md). Sleeping rigid bodies
+also wake when moved or rotated; rewriting their unchanged pose leaves them asleep.
+The matching package manifests and [qualification receipt](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.5/QUALIFICATION.json)
+identify the exact source, workflow runs, and browser results. Older preview
+artifacts remain unchanged and affected by the CCD defect.
+
+This is functional qualification, not a guarantee of pixel correctness,
+WebKit/Safari or mobile support, or device performance. See the
+[capture investigation](web-capture-diagnosis.md) and [acceptance guide](release-qualification.md).
 
 ## Web preview 4 (2026-11-14)
 

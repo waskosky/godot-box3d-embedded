@@ -14,17 +14,17 @@ Erin Catto's engine. Native fixes are maintained and tested there without waitin
 for upstream acceptance. The thin-surface CCD response correction is part of
 that source; CMake and SCons compile it directly, without a patching overlay.
 See [the correction and regression scope](docs/ccd-response.md).
-The previously published **preview 4 binaries still contain this defect**,
-including failures at 30/60/120 Hz. Rebuild matching native/Web artifacts to
-use the correction; do not combine an old static template with a new addon.
+**Preview 5 includes this correction.** The older preview binaries are
+unchanged and still affected. Do not combine an old static template with a
+new addon.
 
 ## Try the prebuilt Web preview
 
-Use **Godot 4.7** with [Web preview 4](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.4). Install its [native editor addon](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.4/godot-box3d-embedded-native-editor.zip) by copying `addons/godot-box3d/` into your project, then select **Box3D Physics** and the Compatibility renderer.
+Use **Godot 4.7** with [Web preview 5](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.5). Install its [native editor addon](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.5/godot-box3d-embedded-native-editor.zip) by copying `addons/godot-box3d/` into your project, then select **Box3D Physics** and the Compatibility renderer.
 
-For worker-main execution, download the [static Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.4/godot-box3d-embedded-static-web.zip) and follow [static embedding](docs/static-embedding.md#use-the-prebuilt-preview) to select its Debug/Release templates. For an ordinary extension export, use the [ordinary Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.4/godot-box3d-web-release.zip) and [Web quick start](WEB_QUICKSTART.md). Keep the files from the same release together and verify the accompanying checksums.
+For worker-main execution, download the [static Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.5/godot-box3d-embedded-static-web.zip) and follow [static embedding](docs/static-embedding.md#use-the-prebuilt-preview) to select its Debug/Release templates. For an ordinary extension export, use the [ordinary Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.5/godot-box3d-web-release.zip) and [Web quick start](WEB_QUICKSTART.md). Keep the files from the same release together and verify the accompanying checksums.
 
-Preview 4 adds [dense-mesh and internal-edge contact fixes](docs/box3d-terrain-evaluation.md) and [world-anchored pin/hinge/slider joints with safe endpoint lifecycle](docs/world-joint-qualification.md). Its native libraries and Web templates use qualified runtime source `14a4f86` and original-maintainer Box3D `be8c731`. It retains preview 3's live filters/materials and corrected joint motor units. See [Web preview qualification](docs/web-preview.md) for exact artifacts and limits. Support documentation and smoke-fixture revisions are identified separately from the frozen binaries.
+Preview 5 fixes thin-surface CCD response and wakes sleeping rigid bodies after a position or rotation edit. It retains [dense-mesh and internal-edge contact fixes](docs/box3d-terrain-evaluation.md), [world-anchored joints](docs/world-joint-qualification.md), live filters/materials, and corrected hinge motor units. Each package records the exact source and native engine pin; see [Web preview qualification](docs/web-preview.md).
 
 The release includes [qualification evidence](docs/web-preview.md): bounded physics and cleanup pass in Chromium and Firefox on Linux software GL. Intermittent text artifacts, WebKit shader failures, hardware performance and physical mobile acceptance remain explicit limits. A submitted smoke-result frame does not certify pixel correctness.
 
