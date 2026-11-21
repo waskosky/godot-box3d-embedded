@@ -38,6 +38,8 @@ The native suite exercises actual Godot bodies and queries, including:
   hole-boundary falls and moving/rotating platform jump detachment.
 - CCD against a thin wall, rotated off-center impulse/inertia, sleep/wake,
   sustained finite states and repeated body creation/removal.
+- Sleeping rigid bodies wake after a position or rotation change; rewriting
+  the current physics pose leaves them asleep.
 - Separate coplanar terrain tiles in both directions on floors, walls and
   ceilings, with continuous-mesh controls and bounded support height.
 - Live material friction/restitution edits and rough/absorbent mixing; staged
