@@ -9,7 +9,7 @@ GODOT_CPP_REF="fbbf9ec4efd8f1055d00edb8d926eef8ba4c2cce"
 
 BOX3D_REPOSITORY="https://github.com/waskosky/box3d.git"
 BOX3D_LABEL="main"
-BOX3D_REF="8520de94af99dafa7d5e78ea4ff8401aadddf547"
+BOX3D_REF="8ea20796a54a31492ded656dfa9e60374de7b24c"
 
 GODOT_ENGINE_REPOSITORY="https://github.com/godotengine/godot.git"
 GODOT_ENGINE_LABEL="4.7-stable"
