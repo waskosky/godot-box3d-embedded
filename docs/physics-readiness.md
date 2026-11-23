@@ -86,6 +86,8 @@ The [native pin](../dependencies.lock) includes two fixes beyond preview 5:
 
 The browser smoke now requires the mesh elevator to pick up a separated cube and a sleeping brick to remain asleep on an unchanged pose but fall after it is lifted. These checks do not qualify moving concave *dynamic* bodies. The published preview 5 binaries are unchanged.
 
+Native replay snapshots include the cached bounds. Play old native recordings with their original engine; new builds reject the old snapshot format rather than interpreting world-space bounds as mesh-local bounds. This does not change Godot scenes or project files.
+
 ## Remaining acceptance gates
 
 The [CCD response correction](ccd-response.md) moves the former known-failing
