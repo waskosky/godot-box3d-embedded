@@ -136,7 +136,9 @@ func _ccd_response_contract() -> void:
 				capsule.height = 0.04
 				collision.shape = capsule
 			else:
-				collision = _box(Vector3.ONE * 0.02)
+				var box := BoxShape3D.new()
+				box.size = Vector3.ONE * 0.02
+				collision.shape = box
 			body.add_child(collision)
 			add_child(body)
 			cases.append({"body": body, "wall": wall, "frame": frame})
