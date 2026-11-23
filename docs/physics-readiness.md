@@ -86,6 +86,14 @@ The [native pin](../dependencies.lock) includes two fixes beyond preview 5:
 
 The browser smoke now requires the mesh elevator to pick up a separated cube and a sleeping brick to remain asleep on an unchanged pose but fall after it is lifted. These checks do not qualify moving concave *dynamic* bodies. The published preview 5 binaries are unchanged.
 
+**Qualified Godot 4.7 development builds (2026-11-23):** adapter [`23f3684`](https://github.com/waskosky/godot-box3d-embedded/commit/23f3684281bdf09f6a1e639ac30801ed0f6e7f55), native [`6676970`](https://github.com/waskosky/box3d/commit/6676970e116b10a7164f9834022a8e5b811921ec). Download the named artifacts from these runs:
+
+- [Static worker-main: `godot-box3d-embedded-static-web`](https://github.com/waskosky/godot-box3d-embedded/actions/runs/45133880092). Both newly linked templates passed all 20 smoke checks in Chromium and Firefox. Each browser also completed six Release workload cycles with stable post-cleanup node and resource counts after warm-up. Select the Debug and Release templates as described in the [static setup](static-embedding.md#use-the-prebuilt-preview).
+- [Ordinary Web: `godot-box3d-web-release`](https://github.com/waskosky/godot-box3d-embedded/actions/runs/45133880251). The same Release extension also passed all 20 smoke checks with the official Godot 4.7 template in Chromium and Firefox. Follow the [Web quick start](../WEB_QUICKSTART.md).
+- [Matching editor binaries](https://github.com/waskosky/godot-box3d-embedded/actions/runs/45133879816): put the binary for your OS in `addons/godot-box3d/bin/`. The adapter passed 51 headless tests and 774 native CCD controls; the [engine's own matrix](https://github.com/waskosky/box3d/actions/runs/45133778142) passed all 19 jobs.
+
+Keep the Web ZIP, checksum, and build manifest together. Actions downloads expire; if a bundle is no longer available, rebuild from the adapter commit above. This is a development build, not a new tagged release or a physical-device qualification.
+
 Native replay snapshots include the cached bounds. Play old native recordings with their original engine; new builds reject the old snapshot format rather than interpreting world-space bounds as mesh-local bounds. This does not change Godot scenes or project files.
 
 ## Remaining acceptance gates
