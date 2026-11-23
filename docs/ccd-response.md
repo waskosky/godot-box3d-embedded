@@ -50,7 +50,7 @@ same source. A static host **must be relinked**; copying a new side module or
 archive beside an old template cannot update its embedded physics engine.
 Package receipts identify the native fork URL and immutable source pin.
 
-The maintained native baseline is `f3c62759239f662fb9c8463c1108cfb2f74047ef`.
+The first maintained native baseline, used by preview 5, was `f3c62759239f662fb9c8463c1108cfb2f74047ef`.
 Its corrected `distance.c` and `shape.c` are byte-for-byte identical to the
 source-overlay runtime qualified below; moving the correction does not introduce
 another physics change. The fork owns the 774-case regression and keeps all

@@ -26,6 +26,8 @@ For worker-main execution, download the [static Web bundle](https://github.com/w
 
 Preview 5 fixes thin-surface CCD response and wakes sleeping rigid bodies after a position or rotation edit. It retains [dense-mesh and internal-edge contact fixes](docs/box3d-terrain-evaluation.md), [world-anchored joints](docs/world-joint-qualification.md), live filters/materials, and corrected hinge motor units. Each package records the exact source and native engine pin; see [Web preview qualification](docs/web-preview.md).
 
+**Moving platforms:** Preview 5 can miss a rigid body when a moving triangle mesh first reaches it. Use a box collider for an elevator on that release. New source builds include the [moving-mesh and jointed-body corrections](docs/physics-readiness.md#moving-meshes-and-jointed-bodies); static hosts need newly linked templates.
+
 The release includes [qualification evidence](docs/web-preview.md): bounded physics and cleanup pass in Chromium and Firefox on Linux software GL. Intermittent text artifacts, WebKit shader failures, hardware performance and physical mobile acceptance remain explicit limits. A submitted smoke-result frame does not certify pixel correctness.
 
 When upgrading from preview 2, revisit [material tuning](docs/behavior-differences.md#physics-materials)

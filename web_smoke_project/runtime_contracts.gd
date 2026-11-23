@@ -8,13 +8,84 @@ var hinge_impulse_ok: bool = false
 var mesh_contacts_ok: bool = false
 var world_joints_ok: bool = false
 var ccd_response_ok: bool = false
+var moving_mesh_ok: bool = false
+var transform_wake_ok: bool = false
 
 
 func _ready() -> void:
 	position.x = 70
 	_world_joint_contract()
 	_ccd_response_contract()
+	_moving_mesh_contract()
+	_transform_wake_contract()
 	_run()
+
+
+func _moving_mesh_contract() -> void:
+	# Start with a gap: a platform already touching the cube can hide a stale triangle cache.
+	var lift := AnimatableBody3D.new()
+	lift.position.z = -40.0
+	lift.collision_layer = 512
+	lift.collision_mask = 512
+	var mesh := ConcavePolygonShape3D.new()
+	mesh.set_faces(PackedVector3Array([
+		Vector3(-3, 0, -3), Vector3(3, 0, -3), Vector3(-3, 0, 3),
+		Vector3(3, 0, -3), Vector3(3, 0, 3), Vector3(-3, 0, 3),
+	]))
+	var surface := CollisionShape3D.new()
+	surface.shape = mesh
+	lift.add_child(surface)
+	add_child(lift)
+	var cube := RigidBody3D.new()
+	cube.position = lift.position + Vector3.UP * 0.8
+	cube.gravity_scale = 0.0
+	cube.can_sleep = false
+	cube.lock_rotation = true
+	cube.collision_layer = 512
+	cube.collision_mask = 512
+	cube.add_child(_box(Vector3.ONE))
+	add_child(cube)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	for tick in range(1, 61):
+		lift.position.y = 2.0 * tick / 60.0
+		await get_tree().physics_frame
+	await get_tree().physics_frame
+	moving_mesh_ok = absf(lift.position.y - 2.0) < 0.05 and absf(cube.position.y - 2.5) < 0.15
+	lift.queue_free()
+	cube.queue_free()
+
+
+func _transform_wake_contract() -> void:
+	var floor_body := StaticBody3D.new()
+	floor_body.position = Vector3(0, -0.5, -20)
+	floor_body.collision_layer = 512
+	floor_body.collision_mask = 512
+	floor_body.add_child(_box(Vector3(3, 1, 3)))
+	add_child(floor_body)
+	var brick := RigidBody3D.new()
+	brick.position = floor_body.position + Vector3.UP * 1.5
+	brick.collision_layer = 512
+	brick.collision_mask = 512
+	brick.add_child(_box(Vector3.ONE))
+	add_child(brick)
+	var rid: RID = brick.get_rid()
+	for tick in 120:
+		await get_tree().physics_frame
+		if PhysicsServer3D.body_get_state(rid, PhysicsServer3D.BODY_STATE_SLEEPING):
+			break
+	var asleep: bool = PhysicsServer3D.body_get_state(rid, PhysicsServer3D.BODY_STATE_SLEEPING)
+	var pose: Transform3D = PhysicsServer3D.body_get_state(rid, PhysicsServer3D.BODY_STATE_TRANSFORM)
+	PhysicsServer3D.body_set_state(rid, PhysicsServer3D.BODY_STATE_TRANSFORM, pose)
+	var stayed_asleep: bool = PhysicsServer3D.body_get_state(rid, PhysicsServer3D.BODY_STATE_SLEEPING)
+	var raised_y: float = brick.global_position.y + 2.0
+	brick.global_position.y = raised_y
+	brick.force_update_transform()
+	for tick in 20:
+		await get_tree().physics_frame
+	transform_wake_ok = asleep and stayed_asleep and brick.global_position.y < raised_y - 0.15 and brick.linear_velocity.y < -0.5
+	brick.queue_free()
+	floor_body.queue_free()
 
 
 func _ccd_response_contract() -> void:

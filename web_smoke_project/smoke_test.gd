@@ -587,6 +587,14 @@ func _run_checks() -> void:
     _append_status("Thin-surface CCD response: %s" % ("PASS" if ccd_response_ok else "FAIL"))
     if not ccd_response_ok:
         failures.append("CCD response crossed a thin surface or lost tangential travel")
+    var moving_mesh_ok: bool = _runtime_contracts.moving_mesh_ok
+    _append_status("Moving mesh pickup: %s" % ("PASS" if moving_mesh_ok else "FAIL"))
+    if not moving_mesh_ok:
+        failures.append("A rising mesh platform did not pick up a separated rigid body")
+    var transform_wake_ok: bool = _runtime_contracts.transform_wake_ok
+    _append_status("Sleeping rigid-body transform: %s" % ("PASS" if transform_wake_ok else "FAIL"))
+    if not transform_wake_ok:
+        failures.append("A pose rewrite woke a sleeper, or the lifted brick failed to fall")
     if not mesh_contacts_ok:
         failures.append("Mesh seam/dense contact support failed")
     if not materials_ok or not joints_ok:

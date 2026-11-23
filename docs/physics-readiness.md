@@ -77,6 +77,15 @@ fixture/query differences. Unsupported scaling is warned about, not normalized
 or implicitly declared supported. The [behavior notes](behavior-differences.md)
 also explain finite world boundaries and material migration.
 
+## Moving meshes and jointed bodies
+
+The [native pin](../dependencies.lock) includes two fixes beyond preview 5:
+
+- A lifting or tilting triangle mesh can contact a rigid body that was initially separated from it. The native triangle cache tracks the visitor relative to the mesh. Previously, a moving mesh could pass through a stationary cube even though a box platform picked it up. See [Box3D #231](https://github.com/erincatto/box3d/issues/231).
+- Freezing and unfreezing a hub connected to sleeping bodies preserves both joints without a kick. The engine wakes the connected islands before transferring any joint. See [Box3D #235](https://github.com/erincatto/box3d/issues/235).
+
+The browser smoke now requires the mesh elevator to pick up a separated cube and a sleeping brick to remain asleep on an unchanged pose but fall after it is lifted. These checks do not qualify moving concave *dynamic* bodies. The published preview 5 binaries are unchanged.
+
 ## Remaining acceptance gates
 
 The [CCD response correction](ccd-response.md) moves the former known-failing

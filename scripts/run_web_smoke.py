@@ -46,6 +46,8 @@ def required_checks(lines: list[str]) -> dict[str, bool]:
         "mesh_contacts": "Mesh seam/dense contacts: PASS" in lines,
         "world_joints": "World-anchored pin/hinge/slider: PASS" in lines,
         "ccd_response": "Thin-surface CCD response: PASS" in lines,
+        "moving_mesh": "Moving mesh pickup: PASS" in lines,
+        "transform_wake": "Sleeping rigid-body transform: PASS" in lines,
         "physics": "RESULT: PASS" in lines,
         "render_submission": "Smoke result frame submitted" in lines,
     }
