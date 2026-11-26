@@ -56,12 +56,18 @@ func _test_shared_shape_live_update() -> void:
 
 func _test_live_concave_update() -> void:
 	var shape: ConcavePolygonShape3D = ConcavePolygonShape3D.new()
-	shape.set_faces(_horizontal_quad(0.0))
 	var body: StaticBody3D = _make_static_body(Vector3(0, 0, 0), shape)
 
 	await physics_frame
 	await physics_frame
-	_check_ray_height(0.0, 0.0, "the initial concave mesh is queryable")
+	var query := PhysicsRayQueryParameters3D.create(Vector3(0, 4, 0), Vector3(0, -2, 0))
+	_check(root.world_3d.direct_space_state.intersect_ray(query).is_empty(), "an attached empty concave shape does not hit")
+
+	# A runtime-baked mesh can receive its first faces only after attachment.
+	shape.set_faces(_horizontal_quad(0.0))
+	await physics_frame
+	await physics_frame
+	_check_ray_height(0.0, 0.0, "adding faces to an attached empty concave shape makes it queryable")
 
 	# Concave and heightfield fixtures retain pointers to their source geometry, so this
 	# specifically verifies the old fixture is gone before set_data replaces that buffer.
