@@ -19,7 +19,7 @@ STATIC_WEB_ARCHIVES = {
     "godot-cpp": "bin/web/static/libgodot-cpp.web.template_release.wasm32.a",
 }
 PINNED_REFS = {
-    "BOX3D_REF": "8ea20796a54a31492ded656dfa9e60374de7b24c",
+    "BOX3D_REF": "d47ccfb1340d41171123c65a946c197a419663ad",
     "GODOT_CPP_REF": "fbbf9ec4efd8f1055d00edb8d926eef8ba4c2cce",
     "GODOT_ENGINE_REF": "5b4e0cb0fd279832bbdd69fed5354d4e5ad26f88",
     "EMSDK_REF": "e4fe26ef59168ff44f4c23c466e497bf60b3411e",

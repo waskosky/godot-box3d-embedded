@@ -14,19 +14,16 @@ Erin Catto's engine. Native fixes are maintained and tested there without waitin
 for upstream acceptance. The thin-surface CCD response correction is part of
 that source; CMake and SCons compile it directly, without a patching overlay.
 See [the correction and regression scope](docs/ccd-response.md).
-**Preview 5 includes this correction.** The older preview binaries are
-unchanged and still affected. Do not combine an old static template with a
-new addon.
+**Preview 5 and newer include this correction.** Earlier binaries are unchanged
+and still affected. Do not combine an old static template with a new addon.
 
 ## Try the prebuilt Web preview
 
-Use **Godot 4.7** with [Web preview 5](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.5). Install its [native editor addon](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.5/godot-box3d-embedded-native-editor.zip) by copying `addons/godot-box3d/` into your project, then select **Box3D Physics** and the Compatibility renderer.
+Use **Godot 4.7** with [Web preview 6](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.6). Install its [native editor addon](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.6/godot-box3d-embedded-native-editor.zip) by copying `addons/godot-box3d/` into your project, then select **Box3D Physics** and the Compatibility renderer.
 
-For worker-main execution, download the [static Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.5/godot-box3d-embedded-static-web.zip) and follow [static embedding](docs/static-embedding.md#use-the-prebuilt-preview) to select its Debug/Release templates. For an ordinary extension export, use the [ordinary Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.5/godot-box3d-web-release.zip) and [Web quick start](WEB_QUICKSTART.md). Keep the files from the same release together and verify the accompanying checksums.
+For worker-main execution, download the [static Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.6/godot-box3d-embedded-static-web.zip) and follow [static embedding](docs/static-embedding.md#use-the-prebuilt-preview) to select its Debug/Release templates. For an ordinary extension export, use the [ordinary Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.6/godot-box3d-web-release.zip) and [Web quick start](WEB_QUICKSTART.md). Keep the files from the same release together and verify the accompanying checksums.
 
-Preview 5 fixes thin-surface CCD response and wakes sleeping rigid bodies after a position or rotation edit. It retains [dense-mesh and internal-edge contact fixes](docs/box3d-terrain-evaluation.md), [world-anchored joints](docs/world-joint-qualification.md), live filters/materials, and corrected hinge motor units. Each package records the exact source and native engine pin; see [Web preview qualification](docs/web-preview.md).
-
-**Moving platforms:** Preview 5 can miss first contact between a moving triangle mesh and a rigid body. Use a box collider for an elevator on that release, or download the [newly linked worker-main templates](https://github.com/waskosky/godot-box3d-embedded/actions/runs/45147938595). The [qualification notes](docs/physics-readiness.md#moving-meshes-and-jointed-bodies) link the matching editor and ordinary Web builds. Replacing the addon alone does not update an embedded engine.
+Preview 6 handles invalid, very thin convex hulls without hanging, restores first contact on moving triangle-mesh platforms, and refreshes reused contacts after live material edits. It retains preview 5's CCD and rigid-body wake fixes. Each package records the exact source and native engine pin; see [Web preview qualification](docs/web-preview.md#web-preview-6).
 
 The release includes [qualification evidence](docs/web-preview.md): bounded physics and cleanup pass in Chromium and Firefox on Linux software GL. Intermittent text artifacts, WebKit shader failures, hardware performance and physical mobile acceptance remain explicit limits. A submitted smoke-result frame does not certify pixel correctness.
 

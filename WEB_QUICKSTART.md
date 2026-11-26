@@ -2,14 +2,14 @@
 
 Godot Web exports can load `godot-box3d` when the extension side module and the Godot Web template are built with matching dynamic-link settings. This repository uses a supported single-threaded profile with Godot 4.7 and Emscripten 4.0.20.
 
-Preview 5 and current source builds use our maintained [native Box3D fork](https://github.com/waskosky/box3d)
+Preview 5 and newer builds use our maintained [native Box3D fork](https://github.com/waskosky/box3d)
 with the [CCD response correction](docs/ccd-response.md). Older preview
 binaries do not include it; an old embedded template cannot be updated by
 copying a newer archive beside it.
 
 ## Fastest route: use a prebuilt Web bundle
 
-For **Godot 4.7**, install the [preview 5 native editor addon](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.5/godot-box3d-embedded-native-editor.zip). Download its matching [Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.5/godot-box3d-web-release.zip) and [SHA-256 checksum](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.5/godot-box3d-web-release.zip.sha256). See the [qualification and limits](docs/web-preview.md) before deployment. When upgrading from preview 2, read the [material](docs/behavior-differences.md#physics-materials) and [motor retuning](docs/behavior-differences.md#hinge-motor-impulse-budget) notes. For development snapshots, download the `godot-box3d-web-release` artifact from a successful [Web build and smoke run](https://github.com/waskosky/godot-box3d-embedded/actions/workflows/web.yml). Match the addon and Web files to the same qualified source revision.
+For **Godot 4.7**, install the [preview 6 native editor addon](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.6/godot-box3d-embedded-native-editor.zip). Download its matching [Web bundle](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.6/godot-box3d-web-release.zip) and [SHA-256 checksum](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.6/godot-box3d-web-release.zip.sha256). See the [qualification and limits](docs/web-preview.md) before deployment. When upgrading from preview 2, read the [material](docs/behavior-differences.md#physics-materials) and [motor retuning](docs/behavior-differences.md#hinge-motor-impulse-budget) notes. For development snapshots, download the `godot-box3d-web-release` artifact from a successful [Web build and smoke run](https://github.com/waskosky/godot-box3d-embedded/actions/workflows/web.yml). Match the addon and Web files to the same qualified source revision.
 
 The archive contains:
 

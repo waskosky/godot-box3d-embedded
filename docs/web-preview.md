@@ -5,12 +5,32 @@ title: Web preview qualification
 # Web preview qualification
 
 Download the matching native editor addon, static bundle or ordinary Web package
-from [Web preview 5](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.5).
+from [Web preview 6](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.6).
 This is an experimental development milestone, not production, rendered-frame,
 hardware performance or physical-device certification. Earlier releases and
 their immutable evidence are retained below for comparison and rollback.
 Documentation and regression-only follow-ups do not change the tested physics
 source or replace its artifact identity. Ordinary Web CI does not qualify static embedding.
+
+## Web preview 6
+
+This preview keeps the native CCD correction and adds [the thin convex hull
+fix](https://github.com/erincatto/box3d/issues/225). Hulls that are too thin
+for Box3D's tolerances can be rejected rather than hanging or producing invalid
+geometry. Use `BoxShape3D` when the intended shape is a thin box.
+
+It also includes the [moving-mesh, jointed-body and live material
+fixes](physics-readiness.md#moving-meshes-and-jointed-bodies) added since
+preview 5. The existing lifecycle test now covers attaching an empty concave
+mesh and adding its first faces later, as in [the navigation-mesh report](https://github.com/bearlikelion/godot-box3d/issues/48#issuecomment-7198445354).
+This concave-mesh behavior was already fixed; the new test protects it.
+
+Use the editor addon and Web templates from the same release. The [qualification
+receipt](https://github.com/waskosky/godot-box3d-embedded/releases/download/v0.2.7-embedded.6/QUALIFICATION.json)
+identifies the source, checksums, and functional browser results. These results
+do not qualify Safari, physical mobile devices, real-GPU rendering, or hardware
+startup, frame pacing, and memory budgets. Preview 5 remains available for
+rollback.
 
 ## Web preview 5
 

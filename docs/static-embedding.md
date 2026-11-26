@@ -10,7 +10,7 @@ The purpose is to run the application main loop in a worker while the browser ow
 
 ## Use the prebuilt preview
 
-[Web preview 5](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.5) contains matching artifacts for Godot 4.7, including the CCD response and rigid-body wake fixes:
+[Web preview 6](https://github.com/waskosky/godot-box3d-embedded/releases/tag/v0.2.7-embedded.6) contains matching artifacts for Godot 4.7:
 
 1. Install `godot-box3d-embedded-native-editor.zip` by copying its `addons/godot-box3d/` into your project. Select **Box3D Physics** and the Compatibility renderer.
 2. Extract `godot-box3d-embedded-static-web.zip`. Set the Web preset's custom Debug and Release template paths to the ZIPs in its `templates/` directory.
@@ -20,7 +20,7 @@ Verify the accompanying `.sha256` files and keep native and Web artifacts from t
 
 Upgrading from preview 2 changes material combining and hinge motor strength.
 Read the [migration notes](behavior-differences.md#hinge-motor-impulse-budget)
-before reusing tuned scenes. Preview 5 retains preview 4's terrain upgrade and
+before reusing tuned scenes. Preview 6 retains preview 4's terrain upgrade and
 its higher construction/update costs. This profile does not claim real-device,
 rendered-frame or performance qualification.
 
