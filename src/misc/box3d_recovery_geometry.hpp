@@ -1,5 +1,7 @@
 #pragma once
 
+#include "box3d_shape_proxy.hpp"
+
 #include <box3d/box3d.h>
 #include <godot_cpp/templates/local_vector.hpp>
 
@@ -11,12 +13,11 @@ struct Box3DRecoveryContact {
 	float separation;
 };
 
-// A resource query has no live fixture. Build its convex geometry once per query,
-// then visit native target fixtures without modifying the physics world.
+// A resource query has no live fixture. Prepare local geometry at the first
+// eligible target and reuse the shape resource's hull across queries.
 class Box3DContactQuery3D {
 public:
-	explicit Box3DContactQuery3D(const b3ShapeProxy& p_proxy);
-	~Box3DContactQuery3D();
+	explicit Box3DContactQuery3D(const Box3DShapeImpl3D* p_shape);
 	Box3DContactQuery3D(const Box3DContactQuery3D&) = delete;
 	Box3DContactQuery3D& operator=(const Box3DContactQuery3D&) = delete;
 
@@ -24,8 +25,8 @@ public:
 			godot::LocalVector<Box3DRecoveryContact>& r_contacts) const;
 
 private:
-	b3ShapeProxy proxy;
-	b3HullData* hull = nullptr;
+	Box3DShapeProxy3D local_proxy;
+	const b3HullData* hull = nullptr;
 };
 
 // Live fixtures already contain local shape transforms (including baked meshes).

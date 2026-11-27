@@ -1,5 +1,7 @@
 #include "box3d_recovery_geometry.hpp"
 
+#include "../shapes/box3d_shape_impl_3d.hpp"
+
 #include <box3d/collision.h>
 #include <box3d/math_functions.h>
 
@@ -301,20 +303,17 @@ float box3d_cast_to_contact(b3ShapeId p_query, b3Transform p_query_transform, b3
 	return best.fraction;
 }
 
-Box3DContactQuery3D::Box3DContactQuery3D(const b3ShapeProxy& p_proxy) : proxy(p_proxy) {
+Box3DContactQuery3D::Box3DContactQuery3D(const Box3DShapeImpl3D* p_shape) :
+		local_proxy(p_shape, godot::Transform3D()) {
+	const b3ShapeProxy& proxy = local_proxy.get_proxy();
 	if (proxy.count >= 4) {
-		hull = b3CreateHull(proxy.points, proxy.count, proxy.count < 255 ? proxy.count : 255);
-	}
-}
-
-Box3DContactQuery3D::~Box3DContactQuery3D() {
-	if (hull != nullptr) {
-		b3DestroyHull(hull);
+		hull = p_shape->get_contact_query_hull(proxy);
 	}
 }
 
 void Box3DContactQuery3D::contacts(b3Transform p_transform, b3ShapeId p_target, float p_margin,
 		godot::LocalVector<Box3DRecoveryContact>& r_contacts) const {
+	const b3ShapeProxy& proxy = local_proxy.get_proxy();
 	if (proxy.count <= 0) {
 		return;
 	}

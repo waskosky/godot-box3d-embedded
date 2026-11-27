@@ -18,6 +18,8 @@
 
 #include <godot_cpp/templates/local_vector.hpp>
 
+#include <optional>
+
 namespace {
 
 struct OverlapContext {
@@ -77,7 +79,8 @@ bool overlap_result_fcn(b3ShapeId p_shape_id, void* p_context) {
 
 struct ContactQueryContext {
 	const Box3DQueryFilter3D* filter = nullptr;
-	const Box3DContactQuery3D* geometry = nullptr;
+	const Box3DShapeImpl3D* shape = nullptr;
+	std::optional<Box3DContactQuery3D> geometry;
 	b3Transform transform = b3Transform_identity;
 	float margin = 0.0f;
 	Vector3* results = nullptr;
@@ -99,6 +102,9 @@ bool contact_query_result_fcn(b3ShapeId p_shape_id, void* p_context) {
 		return true;
 	}
 
+	if (!ctx->geometry) {
+		ctx->geometry.emplace(ctx->shape);
+	}
 	LocalVector<Box3DRecoveryContact> contacts;
 	ctx->geometry->contacts(ctx->transform, p_shape_id, ctx->margin, contacts);
 	for (const Box3DRecoveryContact& contact : contacts) {
@@ -654,11 +660,9 @@ bool Box3DPhysicsDirectSpaceState3D::_collide_shape(
 	Box3DQueryFilter3D filter(p_collision_mask, p_collide_with_bodies, p_collide_with_areas);
 	filter.direct_state = this;
 
-	const Box3DShapeProxy3D local_proxy(shape, Transform3D());
-	const Box3DContactQuery3D geometry(local_proxy.get_proxy());
 	ContactQueryContext context;
 	context.filter = &filter;
-	context.geometry = &geometry;
+	context.shape = shape;
 	context.transform = godot_to_b3_transform(p_transform);
 	context.margin = MAX(0.0f, (float)p_margin);
 	context.results = static_cast<Vector3*>(p_results);
@@ -693,11 +697,9 @@ bool Box3DPhysicsDirectSpaceState3D::_rest_info(
 	Box3DQueryFilter3D filter(p_collision_mask, p_collide_with_bodies, p_collide_with_areas);
 	filter.direct_state = this;
 
-	const Box3DShapeProxy3D local_proxy(shape, Transform3D());
-	const Box3DContactQuery3D geometry(local_proxy.get_proxy());
 	ContactQueryContext context;
 	context.filter = &filter;
-	context.geometry = &geometry;
+	context.shape = shape;
 	context.transform = godot_to_b3_transform(p_transform);
 	context.margin = MAX(0.0f, (float)p_margin);
 	context.rest = p_info;

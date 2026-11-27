@@ -81,6 +81,7 @@ func _run() -> void:
 	_check(not margin_rest.is_empty() and margin_rest.get("normal", Vector3.ZERO).distance_to(Vector3.RIGHT) < 0.01, "rest info includes a margin shell with a valid normal")
 	var capped := state.collide_shape(_query(box, Vector3(0.6, 0, 0)), 1)
 	_check(capped.size() == 2, "contact pairs respect max_results")
+	_test_edited_cylinder_query(state, solid)
 	var excluded := _query(sphere, Vector3(10.6, 0, 0))
 	excluded.exclude = [terrain.get_rid()]
 	_check(state.collide_shape(excluded).is_empty() and state.get_rest_info(excluded).is_empty(), "terrain queries honor exclusions")
@@ -104,6 +105,26 @@ func _run() -> void:
 	if failures == 0:
 		print("RESULT: PASS - direct queries report surface pairs, rest normals, margins, filtering and contact velocity")
 	quit(1 if failures else 0)
+
+
+func _test_edited_cylinder_query(state: PhysicsDirectSpaceState3D, target: StaticBody3D) -> void:
+	var cylinder := CylinderShape3D.new()
+	cylinder.height = 0.4
+	cylinder.radius = 0.5
+	var corner := _query(cylinder, Vector3(0.8, 0, 0.8))
+	corner.exclude = [target.get_rid()]
+	_check(state.get_rest_info(corner).is_empty() and state.collide_shape(corner).is_empty(),
+		"a cylinder query skips an excluded overlapping target")
+	corner.exclude = []
+	_check(state.get_rest_info(corner).get("rid") == target.get_rid() and not state.collide_shape(corner).is_empty(),
+		"both cylinder contact queries hit the corner")
+
+	# The smaller cylinder's AABB still overlaps the box, but neither surface touches.
+	cylinder.radius = 0.35
+	_check(state.get_rest_info(corner).is_empty() and state.collide_shape(corner).is_empty(),
+		"both queries use the edited cylinder instead of the old hull")
+	cylinder.radius = 0.5
+	_check(state.get_rest_info(corner).get("rid") == target.get_rid(), "restoring the cylinder radius restores contact")
 
 
 func _check_pairs(pairs: Array[Vector3], normal: Vector3, depth: float, label: String) -> void:

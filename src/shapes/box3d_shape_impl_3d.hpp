@@ -6,20 +6,21 @@
 #include <godot_cpp/variant/rid.hpp>
 #include <godot_cpp/variant/variant.hpp>
 
+#include <atomic>
+
 using namespace godot;
 
 class Box3DShapedObjectImpl3D;
+struct b3HullData;
+struct b3ShapeProxy;
 
-// One instance per Shape3D RID. Holds the Godot-facing configuration (radius, half-extents,
-// mesh data, ...) plus the set of owning bodies/areas. Box3D has no equivalent "detached
-// shape resource" object of its own -- geometry only exists once baked into a live
-// b3ShapeId attached to a body -- so this class exists purely on the Godot side to cache
-// the Variant configuration and let multiple Box3DShapeInstance3D attachments share it.
+// One instance per Shape3D RID. Holds the Godot-facing shape data, shared query
+// geometry, and the bodies/areas whose native fixtures must be refreshed on edits.
 class Box3DShapeImpl3D {
 public:
 	using ShapeType = PhysicsServer3D::ShapeType;
 
-	virtual ~Box3DShapeImpl3D() = default;
+	virtual ~Box3DShapeImpl3D();
 
 	RID get_rid() const { return rid; }
 
@@ -32,6 +33,10 @@ public:
 	virtual void set_data(const Variant& p_data) = 0;
 
 	virtual AABB get_aabb() const = 0;
+
+	// p_local_proxy contains uninflated, shape-local points. The hull lives until
+	// the next shape data change or the resource's destruction.
+	const b3HullData* get_contact_query_hull(const b3ShapeProxy& p_local_proxy) const;
 
 	void add_owner(Box3DShapedObjectImpl3D* p_owner);
 
@@ -46,4 +51,9 @@ public:
 protected:
 	RID rid;
 	HashMap<Box3DShapedObjectImpl3D*, int32_t> owner_ref_counts;
+
+private:
+	void _clear_contact_query_hull();
+
+	mutable std::atomic<b3HullData*> contact_query_hull{nullptr};
 };
