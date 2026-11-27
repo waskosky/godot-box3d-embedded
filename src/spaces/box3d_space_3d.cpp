@@ -102,13 +102,31 @@ void Box3DSpace3D::unregister_body(Box3DBodyImpl3D* p_body) {
 	_remove_object_from_overlaps(p_body);
 }
 
+void Box3DSpace3D::register_area(Box3DAreaImpl3D* p_area) {
+	areas.insert(p_area);
+	update_area_override_membership(p_area);
+}
+
 void Box3DSpace3D::unregister_area(Box3DAreaImpl3D* p_area) {
 	if (!areas.erase(p_area)) {
 		return;
 	}
 
+	override_areas.erase(p_area);
 	_remove_object_from_overlaps(p_area);
 	p_area->clear_overlaps();
+}
+
+void Box3DSpace3D::update_area_override_membership(Box3DAreaImpl3D* p_area) {
+	// The default area supplies world parameters; it isn't a registered sensor.
+	if (!areas.has(p_area)) {
+		return;
+	}
+	if (p_area->has_space_override()) {
+		override_areas.insert(p_area);
+	} else {
+		override_areas.erase(p_area);
+	}
 }
 
 void Box3DSpace3D::_remove_object_from_overlaps(Box3DShapedObjectImpl3D* p_object) {
@@ -219,12 +237,7 @@ Box3DSpace3D::AreaOverrides Box3DSpace3D::compute_area_overrides(Box3DBodyImpl3D
 	AreaOverrides result;
 
 	LocalVector<Box3DAreaImpl3D*> overlapping;
-	for (Box3DAreaImpl3D* area : areas) {
-		if (area->get_gravity_mode() == PhysicsServer3D::AREA_SPACE_OVERRIDE_DISABLED &&
-				area->get_linear_damp_mode() == PhysicsServer3D::AREA_SPACE_OVERRIDE_DISABLED &&
-				area->get_angular_damp_mode() == PhysicsServer3D::AREA_SPACE_OVERRIDE_DISABLED) {
-			continue;
-		}
+	for (Box3DAreaImpl3D* area : override_areas) {
 		if (area->get_overlaps().has(p_body->get_rid())) {
 			overlapping.push_back(area);
 		}

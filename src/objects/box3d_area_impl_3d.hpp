@@ -13,7 +13,7 @@ using namespace godot;
 // isSensor=true/enableSensorEvents=true (see Box3DShapedObjectImpl3D::_is_sensor_body).
 // All area-only state (gravity/damp override mode+vector, priority, monitor callbacks,
 // overlap refcounting) lives here; Box3D has zero concept of any of it. The server applies
-// gravity/damp overrides manually each step (see Box3DSpace3D::pre_step) using the overlap
+// gravity/damp overrides manually each step (see Box3DSpace3D::step) using the overlap
 // bookkeeping populated from b3SensorBeginTouchEvent/EndTouchEvent.
 class Box3DAreaImpl3D final : public Box3DShapedObjectImpl3D {
 public:
@@ -49,15 +49,11 @@ public:
 
 	OverrideMode get_gravity_mode() const { return gravity_mode; }
 
-	void set_gravity_mode(OverrideMode p_mode) { gravity_mode = p_mode; }
-
 	OverrideMode get_linear_damp_mode() const { return linear_damp_mode; }
-
-	void set_linear_damp_mode(OverrideMode p_mode) { linear_damp_mode = p_mode; }
 
 	OverrideMode get_angular_damp_mode() const { return angular_damp_mode; }
 
-	void set_angular_damp_mode(OverrideMode p_mode) { angular_damp_mode = p_mode; }
+	bool has_space_override() const;
 
 	float get_gravity() const { return gravity; }
 
@@ -103,6 +99,8 @@ protected:
 	bool _is_sensor_body() const override { return true; }
 
 private:
+	void _set_override_mode(OverrideMode& r_mode, OverrideMode p_mode);
+
 	Callable body_monitor_callback;
 	Callable area_monitor_callback;
 

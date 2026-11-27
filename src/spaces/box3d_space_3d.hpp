@@ -59,9 +59,10 @@ public:
 
 	void unregister_body(Box3DBodyImpl3D* p_body);
 
-	void register_area(Box3DAreaImpl3D* p_area) { areas.insert(p_area); }
+	void register_area(Box3DAreaImpl3D* p_area);
 
 	void unregister_area(Box3DAreaImpl3D* p_area);
+	void update_area_override_membership(Box3DAreaImpl3D* p_area);
 
 	void set_hinge_motor_impulse(b3JointId p_joint, float p_impulse);
 
@@ -152,6 +153,7 @@ private:
 
 	HashSet<Box3DBodyImpl3D*> bodies;
 	HashSet<Box3DAreaImpl3D*> areas;
+	HashSet<Box3DAreaImpl3D*> override_areas;
 	HashMap<uint64_t, HingeMotorLimit> hinge_motor_limits;
 
 	HashMap<SensorPairKey, SensorPair, SensorPairKey> sensor_pairs;

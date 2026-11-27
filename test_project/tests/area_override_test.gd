@@ -12,6 +12,7 @@ func _run() -> void:
 	await _test_gravity_combine()
 	await _test_linear_damp_replace()
 	await _test_angular_damp_replace()
+	await _test_live_override_modes()
 
 	if failures == 0:
 		print("RESULT: PASS - area gravity and damping overrides are honored")
@@ -122,6 +123,52 @@ func _test_angular_damp_replace() -> void:
 	damped.queue_free()
 	free_body.queue_free()
 	await physics_frame
+
+
+func _test_live_override_modes() -> void:
+	var area := _make_area(Vector3.ZERO, Vector3(20, 20, 20))
+	var body := _make_body(Vector3.ZERO)
+	var entries := [0]
+	area.body_entered.connect(func(other: Node3D) -> void:
+		if other == body:
+			entries[0] += 1
+	)
+	for frame in 4:
+		await physics_frame
+	var state := PhysicsServer3D.body_get_direct_state(body.get_rid())
+	var default_gravity := state.total_gravity
+	var default_linear_damp := state.total_linear_damp
+	var default_angular_damp := state.total_angular_damp
+	_check(entries[0] == 1, "monitor-only area still reports an entry")
+
+	area.gravity = 0.0
+	area.gravity_space_override = Area3D.SPACE_OVERRIDE_REPLACE
+	area.linear_damp = 6.0
+	area.linear_damp_space_override = Area3D.SPACE_OVERRIDE_REPLACE
+	await physics_frame
+	_check(state.total_gravity.is_zero_approx() and is_equal_approx(state.total_linear_damp, 6.0),
+		"enabling overrides affects a body already inside the area")
+
+	area.gravity_space_override = Area3D.SPACE_OVERRIDE_DISABLED
+	await physics_frame
+	_check(state.total_gravity.is_equal_approx(default_gravity) and is_equal_approx(state.total_linear_damp, 6.0),
+		"disabling gravity keeps the remaining damping override")
+	area.linear_damp_space_override = Area3D.SPACE_OVERRIDE_DISABLED
+	await physics_frame
+	_check(is_equal_approx(state.total_linear_damp, default_linear_damp) and entries[0] == 1,
+		"disabling the last override restores defaults without a second entry")
+
+	root.remove_child(area)
+	area.angular_damp = 7.0
+	area.angular_damp_space_override = Area3D.SPACE_OVERRIDE_REPLACE
+	root.add_child(area)
+	for frame in 4:
+		await physics_frame
+	_check(is_equal_approx(state.total_angular_damp, 7.0), "a reattached area uses its preconfigured override")
+	area.free()
+	await physics_frame
+	_check(is_equal_approx(state.total_angular_damp, default_angular_damp), "freeing an active area restores damping")
+	body.free()
 
 
 func _make_area(position: Vector3, size: Vector3) -> Area3D:

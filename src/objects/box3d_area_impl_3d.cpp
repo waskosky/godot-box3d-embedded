@@ -1,6 +1,7 @@
 #include "box3d_area_impl_3d.hpp"
 
 #include "../misc/type_conversions.hpp"
+#include "../spaces/box3d_space_3d.hpp"
 
 #include <box3d/box3d.h>
 
@@ -46,7 +47,7 @@ Variant Box3DAreaImpl3D::get_param(PhysicsServer3D::AreaParameter p_param) const
 void Box3DAreaImpl3D::set_param(PhysicsServer3D::AreaParameter p_param, const Variant& p_value) {
 	switch (p_param) {
 		case PhysicsServer3D::AREA_PARAM_GRAVITY_OVERRIDE_MODE:
-			gravity_mode = (OverrideMode)(int)p_value;
+			_set_override_mode(gravity_mode, (OverrideMode)(int)p_value);
 			break;
 		case PhysicsServer3D::AREA_PARAM_GRAVITY:
 			gravity = p_value;
@@ -61,13 +62,13 @@ void Box3DAreaImpl3D::set_param(PhysicsServer3D::AreaParameter p_param, const Va
 			point_gravity_distance = p_value;
 			break;
 		case PhysicsServer3D::AREA_PARAM_LINEAR_DAMP_OVERRIDE_MODE:
-			linear_damp_mode = (OverrideMode)(int)p_value;
+			_set_override_mode(linear_damp_mode, (OverrideMode)(int)p_value);
 			break;
 		case PhysicsServer3D::AREA_PARAM_LINEAR_DAMP:
 			linear_damp = p_value;
 			break;
 		case PhysicsServer3D::AREA_PARAM_ANGULAR_DAMP_OVERRIDE_MODE:
-			angular_damp_mode = (OverrideMode)(int)p_value;
+			_set_override_mode(angular_damp_mode, (OverrideMode)(int)p_value);
 			break;
 		case PhysicsServer3D::AREA_PARAM_ANGULAR_DAMP:
 			angular_damp = p_value;
@@ -77,6 +78,20 @@ void Box3DAreaImpl3D::set_param(PhysicsServer3D::AreaParameter p_param, const Va
 			break;
 		default:
 			break;
+	}
+}
+
+bool Box3DAreaImpl3D::has_space_override() const {
+	return gravity_mode != PhysicsServer3D::AREA_SPACE_OVERRIDE_DISABLED ||
+			linear_damp_mode != PhysicsServer3D::AREA_SPACE_OVERRIDE_DISABLED ||
+			angular_damp_mode != PhysicsServer3D::AREA_SPACE_OVERRIDE_DISABLED;
+}
+
+void Box3DAreaImpl3D::_set_override_mode(OverrideMode& r_mode, OverrideMode p_mode) {
+	const bool had_override = has_space_override();
+	r_mode = p_mode;
+	if (get_space() != nullptr && had_override != has_space_override()) {
+		get_space()->update_area_override_membership(this);
 	}
 }
 
